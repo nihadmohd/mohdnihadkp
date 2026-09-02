@@ -1,6 +1,31 @@
 # Worklog — Multi-Agent Shared Log
 
 ---
+Task ID: 2
+Agent: Main Agent (Super Z)
+Task: V2 — session-expired fix, MN.KP branding, affiliate ads everywhere, full admin control, separate auth pages, shareable URLs, precision view counting
+
+Work Log:
+- Audited prior V2 state: schema (Media/MarqueeItem/AdUnit/FooterLink/FormSubmission/PostView), 16 admin sections, seeds, brand assets were already committed; dev server was down
+- Restarted dev server; verified admin login → /api/auth/me → admin stats chain (session cookie persists — root cause of V1 "session expired" was already addressed by httpOnly cookie + SameSite=None-when-HTTPS logic; confirmed with browser reload test, no expiry modal)
+- Fixed /api/footer 500: FooterLink has no createdAt — removed from orderBy
+- Added missing AdminLoginView (gold theme, /api/auth/admin-login, badge "Restricted Access", redirects straight to /admin) + wired admin-login route into site-root switch + AuthViews dispatcher + "Admin entrance" cross-link on user login footer
+- Fixed AdminSubmissions crash ("Objects are not valid as React child {type, count}"): component expected Record but API returns Array — aligned state shape, derived newCount from byStatus
+- Fixed ProductDetailView crash ("boolean false is not iterable"): Turbopack miscompiled the long inline useState generic — replaced with RelatedProduct type alias
+- Fixed SSR hydration mismatch on direct hash loads: rewrote use-hash-router with useSyncExternalStore (server snapshot '/', client snapshot = real hash) — zero hydration errors after
+- inquiries API now records page context in FormSubmission; InquiryDialog sends current hash route
+- Type-safety pass: fixed all src/ tsc errors (SessionUser.planRenewsAt + banned, NavProps optional announcement, SEO JSON-LD script cast, home-view icon tuples + priceFrom guard, admin-settings SiteSettings cast)
+- DB settings rebranded: siteName=MN.KP, seoTitle/seoDescription updated
+- E2E browser verification (agent-browser): 15 public routes + 16 admin sections — 0 console errors; live counter via gateway (XTransformPort) = "1 live"; ads render on home/blog-list/blog-inline/sidebar/store/services/footer; product detail #/store/item/chatgpt-plus full render (gallery, discount, pros/cons, specs, related, share); blog post view counting de-duplicated across reloads (PostView ledger 1 row, counter stable); stickers insert as markdown from media picker and render inline; contact inquiry → unified submissions inbox with contact details (mailto/tel/WhatsApp actions); full user lifecycle register → verify → login → onboarding; marquee strip on home/blog/store; footer link editor PATCH verified
+- Committed: fbd5fc1
+
+Stage Summary:
+- All 15 V2 requirements delivered and verified end-to-end with zero console errors
+- Admin credentials: admin@nihadkp.com / Nihad@2026 (gold entrance at #/admin-login)
+- Realtime works through gateway (:81) — direct :3000 access shows 0 live (expected)
+- For production: swap DATABASE_URL to Neon/Supabase Postgres, set AUTH_SECRET + INTERNAL_SECRET, wire SMTP
+
+---
 Task ID: 1
 Agent: Main Agent (Super Z)
 Task: Full-stack portfolio platform for MOHAMMED NIHAD KP (blog + store + services + admin + realtime + SEO)
