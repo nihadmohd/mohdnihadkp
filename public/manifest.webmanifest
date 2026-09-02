@@ -1,0 +1,29 @@
+{
+  "name": "Mohammed Nihad KP — AI-Powered Developer & Digital Creator",
+  "short_name": "Nihad KP",
+  "description": "Portfolio, blog, store and services of Mohammed Nihad KP — freelancer, businessman and AI-driven developer from Calicut, Kerala.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1512",
+  "theme_color": "#0d1512",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/avatar.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Blog", "url": "/#/blog" },
+    { "name": "Store", "url": "/#/store" },
+    { "name": "Services", "url": "/#/services" }
+  ]
+}
