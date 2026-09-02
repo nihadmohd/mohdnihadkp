@@ -1,8 +1,8 @@
 'use client'
 
-// Footer — newsletter, socials, ventures, legal links. Sticky bottom on short pages.
-import { useState } from 'react'
-import Link from 'next/link'
+// Footer — newsletter, socials + admin-editable link sections (from /api/footer).
+// Sticky bottom on short pages via mt-auto on the outer wrapper.
+import { useEffect, useState } from 'react'
 import { ArrowRight, MapPin, Check, Loader2, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,13 +14,63 @@ import { LEGAL_DOCS } from '@/lib/legal-content'
 import { LiveBadge } from '@/components/site/live-badge'
 import { useSession, isAdmin } from '@/components/site/site-context'
 import { SocialIcon } from '@/components/shared/social-icon'
+import { AdSlot } from '@/components/shared/ad-slot'
+
+export interface FooterLinkRow {
+  id: string
+  section: string
+  label: string
+  url: string
+  active: boolean
+  sortOrder: number
+}
+
+let footerCache: FooterLinkRow[] | null = null
+export function invalidateFooterCache() {
+  footerCache = null
+}
+
+function FooterNavLink({ link }: { link: FooterLinkRow }) {
+  const cls = 'text-muted-foreground hover:text-primary transition-colors text-left'
+  if (!link.url) {
+    return <button onClick={() => navigate('/')} className={cls}>{link.label}</button>
+  }
+  if (/^https?:\/\//i.test(link.url)) {
+    return (
+      <a href={link.url} target="_blank" rel="noopener noreferrer" className={cls}>
+        {link.label}
+      </a>
+    )
+  }
+  if (link.url.endsWith('.xml') || link.url.endsWith('.txt')) {
+    return (
+      <a href={link.url} className={cls}>{link.label}</a>
+    )
+  }
+  const path = link.url.startsWith('/') ? link.url : `/${link.url}`
+  return <button onClick={() => navigate(path)} className={cls}>{link.label}</button>
+}
 
 export function SiteFooter() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [links, setLinks] = useState<FooterLinkRow[]>(footerCache || [])
   const { toast } = useToast()
   const { user } = useSession()
+
+  useEffect(() => {
+    if (footerCache) return
+    let alive = true
+    api<{ links: FooterLinkRow[] }>('/api/footer')
+      .then((d) => {
+        if (!alive) return
+        footerCache = d.links || []
+        setLinks(footerCache)
+      })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [])
 
   const subscribe = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,7 +79,7 @@ export function SiteFooter() {
     try {
       const res = await api<{ message: string }>('/api/subscribers', {
         method: 'POST',
-        body: { email },
+        body: { email, page: window.location.hash.replace('#', '') || '/' },
       })
       setDone(true)
       toast({ title: 'Subscribed', description: res.message })
@@ -39,6 +89,12 @@ export function SiteFooter() {
       setLoading(false)
     }
   }
+
+  const section = (name: string) => links.filter((l) => l.section === name && l.active)
+  const exploreLinks = section('explore')
+  const venturesLinks = section('ventures')
+  const legalLinks = section('legal')
+  const mainLinks = section('main')
 
   return (
     <footer className="mt-auto border-t border-border/60 bg-card/40 pb-20 lg:pb-0">
@@ -78,7 +134,7 @@ export function SiteFooter() {
           <div className="flex items-center gap-2.5">
             <span className="grid place-items-center size-9 rounded-xl bg-primary text-primary-foreground font-display font-bold text-xs glow-sm" aria-hidden>MN</span>
             <div>
-              <p className="font-display font-semibold">Mohammed Nihad KP</p>
+              <p className="font-display font-semibold">MN.KP — Mohammed Nihad KP</p>
               <p className="text-xs text-muted-foreground">AI-Powered Developer &amp; Digital Creator</p>
             </div>
           </div>
@@ -129,61 +185,63 @@ export function SiteFooter() {
               ))}
             </div>
           </div>
+
+          {/* Footer affiliate ad */}
+          <AdSlot placement="footer" variant="banner" className="pt-2 max-w-lg" />
         </div>
 
-        {/* Explore */}
+        {/* Explore — admin-editable, with static fallback */}
         <nav aria-label="Footer explore">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Explore</p>
           <ul className="space-y-2.5 text-sm">
-            {[
-              ['Blog', '/blog'], ['Store', '/store'], ['Services', '/services'],
-              ['About', '/about'], ['Ventures', '/ventures'], ['Contact', '/contact'],
-              ['Search', '/search'], ['Help Center', '/help'],
-              ...(user ? [['My Account', '/account'], ['Support', '/support']] : [['Sign In', '/login']]),
-              ...(isAdmin(user) ? [['Admin Dashboard', '/admin']] : []),
-            ].map(([label, path]) => (
+            {(exploreLinks.length ? exploreLinks : (
+              [
+                ['Blog', '/blog'], ['Store', '/store'], ['Services', '/services'],
+                ['About', '/about'], ['Search', '/search'], ['Help Center', '/help'],
+              ].map(([label, path]) => ({ id: label, section: 'explore', label, url: path, active: true, sortOrder: 0 }))
+            )).map((l) => (
+              <li key={l.id}><FooterNavLink link={l} /></li>
+            ))}
+            {(user
+              ? [['My Account', '/account'], ['Support', '/support']]
+              : [['Sign In', '/login']]
+            ).map(([label, path]) => (
               <li key={path}>
                 <button onClick={() => navigate(path)} className="text-muted-foreground hover:text-primary transition-colors">
                   {label}
                 </button>
               </li>
             ))}
+            {isAdmin(user) && (
+              <li>
+                <button onClick={() => navigate('/admin')} className="text-primary hover:text-primary/80 transition-colors font-medium">
+                  Admin &amp; Developer
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
 
-        {/* Ventures */}
+        {/* Ventures — admin-editable, with static fallback */}
         <nav aria-label="Footer ventures">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Ventures</p>
           <ul className="space-y-2.5 text-sm">
-            {VENTURES.map((v) => (
-              <li key={v.name}>
-                {v.href ? (
-                  <a href={v.href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
-                    {v.name}
-                  </a>
-                ) : (
-                  <button onClick={() => navigate('/ventures')} className="text-muted-foreground hover:text-primary transition-colors">
-                    {v.name}
-                  </button>
-                )}
-              </li>
+            {(venturesLinks.length ? venturesLinks : VENTURES.map((v) => ({
+              id: v.name, section: 'ventures', label: v.name, url: v.href || '/ventures', active: true, sortOrder: 0,
+            }))).map((l) => (
+              <li key={l.id}><FooterNavLink link={l} /></li>
             ))}
           </ul>
         </nav>
 
-        {/* Legal */}
+        {/* Legal — admin-editable, with static fallback */}
         <nav aria-label="Footer legal">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Legal</p>
           <ul className="space-y-2.5 text-sm max-h-64 overflow-y-auto scrollbar-slim pr-2">
-            {LEGAL_DOCS.map((doc) => (
-              <li key={doc.slug}>
-                <button
-                  onClick={() => navigate(`/legal/${doc.slug}`)}
-                  className="text-muted-foreground hover:text-primary transition-colors text-left"
-                >
-                  {doc.title}
-                </button>
-              </li>
+            {(legalLinks.length ? legalLinks : LEGAL_DOCS.map((doc) => ({
+              id: doc.slug, section: 'legal', label: doc.title, url: `/legal/${doc.slug}`, active: true, sortOrder: 0,
+            }))).map((l) => (
+              <li key={l.id}><FooterNavLink link={l} /></li>
             ))}
           </ul>
         </nav>
@@ -191,7 +249,7 @@ export function SiteFooter() {
 
       <div className="border-t border-border/60">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Mohammed Nihad KP · KP Foundation · All rights reserved.</p>
+          <p>© {new Date().getFullYear()} MN.KP · Mohammed Nihad KP · KP Foundation · All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             <span className="inline-block size-1.5 rounded-full bg-primary" aria-hidden />
             Built with AI, from Calicut to the world.

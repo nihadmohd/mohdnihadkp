@@ -18,6 +18,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { SectionHeading } from '@/components/shared/section-heading'
+import { AdSlot } from '@/components/shared/ad-slot'
 import { InlineError } from '@/components/views/states'
 import { useSeo } from '@/hooks/use-seo'
 import { navigate } from '@/hooks/use-hash-router'
@@ -168,6 +169,9 @@ export default function ServicesView({ initial }: { initial: Array<Record<string
       </section>
 
       {inquiryFor && <InquiryDialog service={inquiryFor} onClose={() => setInquiryFor(null)} />}
+
+      {/* Affiliate ad (admin-managed, services placement) */}
+      <AdSlot placement="services" variant="banner" className="mt-14" />
     </div>
   )
 }

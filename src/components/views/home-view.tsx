@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { SectionHeading, CardSkeleton } from '@/components/shared/section-heading'
+import { AdSlot } from '@/components/shared/ad-slot'
+import { MarqueeStrip } from '@/components/shared/marquee-strip'
 import { LiveBadge } from '@/components/site/live-badge'
 import { navigate } from '@/hooks/use-hash-router'
 import {
@@ -223,6 +225,11 @@ export default function HomeView({ initial }: { initial: InitialData }) {
         </div>
       </section>
 
+      {/* ── Scrolling highlights (admin-managed images) ──── */}
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 pt-4 pb-2" aria-label="Highlights">
+        <MarqueeStrip />
+      </section>
+
       {/* ── What I bring ─────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-20" aria-label="What I bring">
         <SectionHeading
@@ -373,13 +380,18 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                 key={String(p.id)}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-                onClick={() => navigate('/store')}
+                onClick={() => navigate(`/store/item/${String(p.slug)}`)}
                 className="text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 group"
               >
-                <div className="aspect-[4/3] bg-gradient-to-br from-primary/15 via-muted to-amber-500/10 grid place-items-center">
-                  <span className="font-display font-bold text-2xl text-primary/70">
-                    {String(p.name).slice(0, 2).toUpperCase()}
-                  </span>
+                <div className="aspect-[4/3] bg-gradient-to-br from-primary/15 via-muted to-amber-500/10 grid place-items-center overflow-hidden relative">
+                  {p.image ? (
+                     
+                    <img src={String(p.image)} alt={String(p.name)} loading="lazy" className="absolute inset-0 size-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <span className="font-display font-bold text-2xl text-primary/70">
+                      {String(p.name).slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <div className="p-4">
                   <p className="font-semibold text-sm line-clamp-1">{String(p.name)}</p>
@@ -391,6 +403,9 @@ export default function HomeView({ initial }: { initial: InitialData }) {
               </motion.button>
             ))}
           </div>
+
+          {/* Affiliate ad (admin-managed, home placement) */}
+          <AdSlot placement="home" variant="card" className="mt-6 max-w-xl" />
         </section>
       )}
 

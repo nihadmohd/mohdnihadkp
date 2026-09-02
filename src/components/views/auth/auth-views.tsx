@@ -1,10 +1,12 @@
 'use client'
 
-// Auth views — login, register, verify-email, forgot & reset password
+// Auth views — login, admin-login (distinct gold theme), register
+// (violet theme), verify-email, forgot & reset password. Each major
+// auth page has its own color theme as requested.
 import { useEffect, useState, type ReactNode } from 'react'
 import {
   LogIn, UserPlus, Loader2, MailCheck, KeyRound, Eye, EyeOff, ArrowLeft,
-  Check, AlertCircle, ShieldCheck, Sparkles,
+  Check, AlertCircle, ShieldCheck, Sparkles, TerminalSquare, Lock, Copy,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,23 +18,76 @@ import { useSession, type SessionUser } from '@/components/site/site-context'
 import { useSeo } from '@/hooks/use-seo'
 import { SITE } from '@/lib/constants'
 
+// ── Per-page color themes ───────────────────────────────────────
+// login → emerald · admin-login → gold · register → violet
+type AuthTheme = 'emerald' | 'gold' | 'violet'
+
+const THEMES: Record<AuthTheme, {
+  aurora: string
+  iconWrap: string
+  text: string
+  btn: string
+  glow: string
+  label: string
+  input: string
+}> = {
+  emerald: {
+    aurora: 'bg-primary/10',
+    iconWrap: 'bg-primary/12 text-primary',
+    text: 'text-primary',
+    btn: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    glow: 'shadow-lg shadow-primary/25',
+    label: '',
+    input: '',
+  },
+  gold: {
+    aurora: 'bg-amber-400/15',
+    iconWrap: 'bg-gradient-to-br from-amber-400/25 to-amber-600/15 text-amber-500 border border-amber-500/30',
+    text: 'text-amber-500 dark:text-amber-400',
+    btn: 'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 font-bold',
+    glow: 'shadow-lg shadow-amber-500/30',
+    label: 'border-amber-500/40',
+    input: 'focus-visible:ring-amber-500/40 border-amber-500/25',
+  },
+  violet: {
+    aurora: 'bg-violet-500/15',
+    iconWrap: 'bg-violet-500/15 text-violet-500 dark:text-violet-400 border border-violet-500/30',
+    text: 'text-violet-600 dark:text-violet-400',
+    btn: 'bg-violet-600 text-white hover:bg-violet-500',
+    glow: 'shadow-lg shadow-violet-500/25',
+    label: '',
+    input: 'focus-visible:ring-violet-500/40 border-violet-500/25',
+  },
+}
+
 function AuthShell({
-  icon, title, subtitle, children, footer,
+  icon, title, subtitle, children, footer, theme = 'emerald', badge,
 }: {
   icon: ReactNode
   title: string
   subtitle: string
   children: ReactNode
   footer?: ReactNode
+  theme?: AuthTheme
+  badge?: string
 }) {
+  const t = THEMES[theme]
   return (
     <div className="relative flex-1 flex items-center justify-center px-4 py-12 sm:py-16 overflow-hidden">
       <div className="absolute inset-0 grid-bg mask-fade-b opacity-25" aria-hidden />
-      <div className="absolute -top-24 left-1/3 size-80 rounded-full bg-primary/10 blur-3xl animate-aurora" aria-hidden />
+      <div className={`absolute -top-24 left-1/3 size-80 rounded-full ${t.aurora} blur-3xl animate-aurora`} aria-hidden />
+      {theme === 'gold' && (
+        <div className="absolute -bottom-32 right-1/4 size-96 rounded-full bg-amber-500/10 blur-3xl animate-aurora" style={{ animationDelay: '1.2s' }} aria-hidden />
+      )}
       <div className="relative w-full max-w-sm">
+        {badge && (
+          <p className={`mb-3 text-center`}><span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${t.text} ${t.label || 'border-border'}`}>
+            <Lock className="size-3" aria-hidden /> {badge}
+          </span></p>
+        )}
         <div className="rounded-3xl border border-border bg-card p-7 sm:p-8 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-5">
-            <span className="grid place-items-center size-14 rounded-2xl bg-primary/12 text-primary">{icon}</span>
+            <span className={`grid place-items-center size-14 rounded-2xl ${t.iconWrap}`}>{icon}</span>
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-center">{title}</h1>
           <p className="text-sm text-muted-foreground text-center mt-2 leading-relaxed">{subtitle}</p>

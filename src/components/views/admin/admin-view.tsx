@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Newspaper, ShoppingBag, Briefcase, Inbox, MessageSquare, Users,
   MailCheck, ChartLine, LifeBuoy, Settings, LogOut, Bell, Menu, ExternalLink,
-  Radio, type LucideIcon,
+  Radio, Megaphone, Images, Sticker, ClipboardList, PanelBottom, TerminalSquare,
+  type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,17 +21,24 @@ import type { ActivityEntry, AdminAlert } from '@/hooks/use-realtime'
 import AdminDashboard from '@/components/views/admin/admin-dashboard'
 import AdminPosts from '@/components/views/admin/admin-posts'
 import AdminProducts from '@/components/views/admin/admin-products'
+import AdminAds from '@/components/views/admin/admin-ads'
+import AdminMarquee from '@/components/views/admin/admin-marquee'
+import AdminMedia from '@/components/views/admin/admin-media'
 import AdminServices from '@/components/views/admin/admin-services'
 import AdminInquiries from '@/components/views/admin/admin-inquiries'
+import AdminSubmissions from '@/components/views/admin/admin-submissions'
 import AdminComments from '@/components/views/admin/admin-comments'
 import AdminUsers from '@/components/views/admin/admin-users'
 import AdminSubscribers from '@/components/views/admin/admin-subscribers'
 import AdminAnalytics from '@/components/views/admin/admin-analytics'
+import AdminFooter from '@/components/views/admin/admin-footer'
 import AdminSupport from '@/components/views/admin/admin-support'
 import AdminSettings from '@/components/views/admin/admin-settings'
 
 const SECTION_ICONS: Record<string, LucideIcon> = {
   'layout-dashboard': LayoutDashboard, newspaper: Newspaper, 'shopping-bag': ShoppingBag,
+  megaphone: Megaphone, images: Images, sticker: Sticker, 'clipboard-list': ClipboardList,
+  'panel-bottom': PanelBottom,
   briefcase: Briefcase, inbox: Inbox, 'message-square': MessageSquare, users: Users,
   'mail-check': MailCheck, 'chart-line': ChartLine, 'life-buoy': LifeBuoy, settings: Settings,
 }
@@ -48,7 +56,7 @@ export default function AdminView({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
 
-  useSeo({ title: `Admin — ${section}`, description: 'Admin dashboard', path: `/admin/${section}`, noindex: true }, [section])
+  useSeo({ title: `Admin & Developer — ${section}`, description: 'Admin & Developer control center', path: `/admin/${section}`, noindex: true }, [section])
 
   // Toast on new alerts (ref tracks previous count — no initial toast)
   const seenRef = useRef(0)
@@ -77,12 +85,17 @@ export default function AdminView({
       case 'dashboard': return <AdminDashboard feed={feed} alerts={onAlerts} />
       case 'posts': return <AdminPosts editId={sub} />
       case 'products': return <AdminProducts />
+      case 'ads': return <AdminAds />
+      case 'marquee': return <AdminMarquee />
+      case 'media': return <AdminMedia />
       case 'services': return <AdminServices />
       case 'inquiries': return <AdminInquiries />
+      case 'submissions': return <AdminSubmissions />
       case 'comments': return <AdminComments />
       case 'users': return <AdminUsers />
       case 'subscribers': return <AdminSubscribers />
       case 'analytics': return <AdminAnalytics />
+      case 'footer': return <AdminFooter />
       case 'support': return <AdminSupport />
       case 'settings': return <AdminSettings />
       default: return <AdminDashboard feed={feed} alerts={onAlerts} />
@@ -95,8 +108,8 @@ export default function AdminView({
         <button onClick={() => go('/admin')} className="flex items-center gap-2.5 w-full text-left">
           <span className="grid place-items-center size-9 rounded-xl bg-primary text-primary-foreground font-display font-bold text-[11px] glow-sm">MN</span>
           <span>
-            <span className="block font-display font-semibold text-sm leading-tight">Control Center</span>
-            <span className="block text-[11px] text-muted-foreground">nihadkp.com</span>
+            <span className="block font-display font-semibold text-sm leading-tight">Admin &amp; Developer</span>
+            <span className="block text-[11px] text-muted-foreground">MN.KP control center</span>
           </span>
         </button>
       </div>
@@ -177,8 +190,9 @@ export default function AdminView({
           >
             <Menu className="size-5" />
           </button>
-          <h1 className="font-display font-semibold capitalize text-sm sm:text-base truncate">
-            {section === 'dashboard' ? 'Dashboard' : section}
+          <h1 className="font-display font-semibold capitalize text-sm sm:text-base truncate flex items-center gap-2">
+            <TerminalSquare className="size-4 text-primary hidden sm:block" aria-hidden />
+            {section === 'dashboard' ? 'Admin & Developer' : section.replace('-', ' ')}
           </h1>
           <div className="flex-1" />
 

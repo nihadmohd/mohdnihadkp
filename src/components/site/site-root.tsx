@@ -31,6 +31,7 @@ const HomeView = lazy(() => import('@/components/views/home-view'))
 const BlogView = lazy(() => import('@/components/views/blog-view'))
 const BlogPostView = lazy(() => import('@/components/views/blog-post-view'))
 const StoreView = lazy(() => import('@/components/views/store-view'))
+const ProductDetailView = lazy(() => import('@/components/views/product-detail-view'))
 const ServicesView = lazy(() => import('@/components/views/services-view'))
 const AboutView = lazy(() => import('@/components/views/about-view'))
 const VenturesView = lazy(() => import('@/components/views/ventures-view'))
@@ -211,6 +212,7 @@ export default function SiteRoot({ initial }: { initial: InitialData }) {
         if (second) return <BlogPostView slug={second} />
         return <BlogView />
       case 'store':
+        if (second === 'item' && third) return <ProductDetailView slug={third} />
         return <StoreView initial={initial.featuredProducts} />
       case 'services':
         return <ServicesView initial={initial.services} />

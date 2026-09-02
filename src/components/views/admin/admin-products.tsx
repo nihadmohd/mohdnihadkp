@@ -16,6 +16,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
+import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
@@ -29,19 +32,35 @@ interface ProductRow {
   slug: string
   description: string
   image: string | null
+  gallery: string
   price: number | null
+  listPrice: number | null
   rating: number | null
+  ratingCount: number | null
   merchant: string | null
+  brand: string | null
+  source: string
   category: string
   affiliateUrl: string
+  badge: string | null
+  coupon: string | null
+  couponNote: string | null
+  pros: string
+  cons: string
+  specs: string
+  buyText: string
+  disclosure: string | null
   featured: boolean
   active: boolean
   clicks: number
 }
 
 const EMPTY = {
-  name: '', description: '', image: '', price: '', rating: '', merchant: '',
-  category: '', affiliateUrl: '', featured: false, active: true,
+  name: '', description: '', image: '', gallery: '', price: '', listPrice: '',
+  rating: '', ratingCount: '', merchant: '', brand: '', source: 'CUSTOM',
+  category: '', affiliateUrl: '', badge: '', coupon: '', couponNote: '',
+  pros: '', cons: '', specs: '', buyText: 'Buy Now', disclosure: '',
+  featured: false, active: true,
 }
 
 export default function AdminProducts() {
@@ -188,12 +207,24 @@ function ProductDialog({ product, onClose }: { product: ProductRow | null; onClo
     product
       ? {
           name: product.name, description: product.description, image: product.image || '',
-          price: product.price != null ? String(product.price) : '', rating: product.rating != null ? String(product.rating) : '',
-          merchant: product.merchant || '', category: product.category, affiliateUrl: product.affiliateUrl,
+          gallery: product.gallery ? product.gallery.split('|').join('\n') : '',
+          price: product.price != null ? String(product.price) : '',
+          listPrice: product.listPrice != null ? String(product.listPrice) : '',
+          rating: product.rating != null ? String(product.rating) : '',
+          ratingCount: product.ratingCount != null ? String(product.ratingCount) : '',
+          merchant: product.merchant || '', brand: product.brand || '',
+          source: product.source || 'CUSTOM', category: product.category,
+          affiliateUrl: product.affiliateUrl, badge: product.badge || '',
+          coupon: product.coupon || '', couponNote: product.couponNote || '',
+          pros: product.pros ? product.pros.split('|').join('\n') : '',
+          cons: product.cons ? product.cons.split('|').join('\n') : '',
+          specs: product.specs ? product.specs.split('|').join('\n') : '',
+          buyText: product.buyText || 'Buy Now', disclosure: product.disclosure || '',
           featured: product.featured, active: product.active,
         }
       : { ...EMPTY }
   )
+  const [tab, setTab] = useState<'basics' | 'pricing' | 'media' | 'review' | 'advanced'>('basics')
   const [saving, setSaving] = useState(false)
   const { toast } = useToast()
 
@@ -202,7 +233,13 @@ function ProductDialog({ product, onClose }: { product: ProductRow | null; onClo
   const save = async () => {
     setSaving(true)
     try {
-      const body = { ...form, price: form.price === '' ? null : Number(form.price), rating: form.rating === '' ? null : Number(form.rating) }
+      const body = {
+        ...form,
+        price: form.price === '' ? null : Number(form.price),
+        listPrice: form.listPrice === '' ? null : Number(form.listPrice),
+        rating: form.rating === '' ? null : Number(form.rating),
+        ratingCount: form.ratingCount === '' ? null : Number(form.ratingCount),
+      }
       if (product) {
         await api(`/api/products/${product.id}`, { method: 'PUT', body })
       } else {
@@ -217,61 +254,187 @@ function ProductDialog({ product, onClose }: { product: ProductRow | null; onClo
     }
   }
 
+  const TABS = [
+    ['basics', 'Basics'], ['pricing', 'Pricing'], ['media', 'Media'],
+    ['review', 'Pros & Specs'], ['advanced', 'Advanced'],
+  ] as const
+
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-slim">
+      <DialogContent className="max-w-2xl max-h-[92vh] overflow-y-auto scrollbar-slim">
         <DialogHeader>
           <DialogTitle>{product ? 'Edit product' : 'Add affiliate product'}</DialogTitle>
-          <DialogDescription>Shown in the public store — clicks are tracked automatically.</DialogDescription>
+          <DialogDescription>Full control over the store listing — clicks are tracked automatically.</DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5 col-span-2">
-            <Label htmlFor="pr-name">Name *</Label>
-            <Input id="pr-name" value={form.name} onChange={(e) => set('name', e.target.value)} />
-          </div>
-          <div className="space-y-1.5 col-span-2">
-            <Label htmlFor="pr-url">Affiliate URL *</Label>
-            <Input id="pr-url" value={form.affiliateUrl} onChange={(e) => set('affiliateUrl', e.target.value)} placeholder="https://amazon.in/…" />
-          </div>
-          <div className="space-y-1.5 col-span-2">
-            <Label htmlFor="pr-desc">Description</Label>
-            <Textarea id="pr-desc" value={form.description} onChange={(e) => set('description', e.target.value)} rows={3} placeholder="Why this tool? What do you use it for?" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pr-price">Price (₹)</Label>
-            <Input id="pr-price" type="number" min="0" value={form.price} onChange={(e) => set('price', e.target.value)} placeholder="0 = free" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pr-rating">Rating (0–5)</Label>
-            <Input id="pr-rating" type="number" min="0" max="5" step="0.1" value={form.rating} onChange={(e) => set('rating', e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pr-merchant">Merchant</Label>
-            <Input id="pr-merchant" value={form.merchant} onChange={(e) => set('merchant', e.target.value)} placeholder="Amazon / Hostinger / …" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="pr-category">Category</Label>
-            <Input id="pr-category" value={form.category} onChange={(e) => set('category', e.target.value)} placeholder="AI Tools / Hosting / Gear" />
-          </div>
-          <div className="space-y-1.5 col-span-2">
-            <Label htmlFor="pr-image">Image URL</Label>
-            <Input id="pr-image" value={form.image} onChange={(e) => set('image', e.target.value)} placeholder="https://… (optional)" />
-          </div>
-          <div className="flex items-center justify-between col-span-2 rounded-xl border border-border p-3.5">
-            <div>
-              <Label htmlFor="pr-featured" className="text-sm">Featured</Label>
-              <p className="text-[11px] text-muted-foreground">Pinned to homepage teaser</p>
-            </div>
-            <Switch id="pr-featured" checked={form.featured} onCheckedChange={(v) => set('featured', v)} />
-          </div>
-          <div className="flex items-center justify-between col-span-2 rounded-xl border border-border p-3.5">
-            <div>
-              <Label htmlFor="pr-active" className="text-sm">Visible in store</Label>
-              <p className="text-[11px] text-muted-foreground">Hide without deleting</p>
-            </div>
-            <Switch id="pr-active" checked={form.active} onCheckedChange={(v) => set('active', v)} />
-          </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 rounded-xl bg-muted p-1" role="tablist" aria-label="Product form sections">
+          {TABS.map(([id, label]) => (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={tab === id}
+              onClick={() => setTab(id)}
+              className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors ${
+                tab === id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
+
+        {tab === 'basics' && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5 col-span-2">
+              <Label htmlFor="pr-name">Name *</Label>
+              <Input id="pr-name" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Logitech MX Master 3S" />
+            </div>
+            <div className="space-y-1.5 col-span-2">
+              <Label htmlFor="pr-url">Affiliate URL *</Label>
+              <Input id="pr-url" value={form.affiliateUrl} onChange={(e) => set('affiliateUrl', e.target.value)} placeholder="https://amazon.in/dp/…?tag=yourtag-21" />
+            </div>
+            <div className="space-y-1.5 col-span-2">
+              <Label htmlFor="pr-desc">Description</Label>
+              <Textarea id="pr-desc" value={form.description} onChange={(e) => set('description', e.target.value)} rows={3} placeholder="Why this tool? What do you use it for?" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-source">Affiliate source</Label>
+              <Select value={form.source} onValueChange={(v) => set('source', v)}>
+                <SelectTrigger id="pr-source"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AMAZON">Amazon Associates</SelectItem>
+                  <SelectItem value="FLIPKART">Flipkart Affiliate</SelectItem>
+                  <SelectItem value="EBAY">eBay Partner</SelectItem>
+                  <SelectItem value="ALIEXPRESS">AliExpress Affiliate</SelectItem>
+                  <SelectItem value="CUSTOM">Custom / direct</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-category">Category</Label>
+              <Input id="pr-category" value={form.category} onChange={(e) => set('category', e.target.value)} placeholder="Gear / AI Tools / Hosting" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-merchant">Merchant name</Label>
+              <Input id="pr-merchant" value={form.merchant} onChange={(e) => set('merchant', e.target.value)} placeholder="Amazon India" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-brand">Brand</Label>
+              <Input id="pr-brand" value={form.brand} onChange={(e) => set('brand', e.target.value)} placeholder="Logitech" />
+            </div>
+            <div className="flex items-center justify-between col-span-2 rounded-xl border border-border p-3.5">
+              <div>
+                <Label htmlFor="pr-featured" className="text-sm">Featured</Label>
+                <p className="text-[11px] text-muted-foreground">Pinned to homepage teaser + store top</p>
+              </div>
+              <Switch id="pr-featured" checked={form.featured} onCheckedChange={(v) => set('featured', v)} />
+            </div>
+            <div className="flex items-center justify-between col-span-2 rounded-xl border border-border p-3.5">
+              <div>
+                <Label htmlFor="pr-active" className="text-sm">Visible in store</Label>
+                <p className="text-[11px] text-muted-foreground">Hide without deleting</p>
+              </div>
+              <Switch id="pr-active" checked={form.active} onCheckedChange={(v) => set('active', v)} />
+            </div>
+          </div>
+        )}
+
+        {tab === 'pricing' && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-price">Price (₹)</Label>
+              <Input id="pr-price" type="number" min="0" value={form.price} onChange={(e) => set('price', e.target.value)} placeholder="4999" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-listprice">List price (₹)</Label>
+              <Input id="pr-listprice" type="number" min="0" value={form.listPrice} onChange={(e) => set('listPrice', e.target.value)} placeholder="6999 — shown struck-through" />
+              <p className="text-[11px] text-muted-foreground">Higher than price → discount % badge shows automatically.</p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-rating">Rating (0–5)</Label>
+              <Input id="pr-rating" type="number" min="0" max="5" step="0.1" value={form.rating} onChange={(e) => set('rating', e.target.value)} placeholder="4.6" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-ratingcount">Rating count</Label>
+              <Input id="pr-ratingcount" type="number" min="0" value={form.ratingCount} onChange={(e) => set('ratingCount', e.target.value)} placeholder="12847" />
+            </div>
+            <div className="space-y-1.5 col-span-2">
+              <Label htmlFor="pr-badge">Badge</Label>
+              <Input id="pr-badge" value={form.badge} onChange={(e) => set('badge', e.target.value)} placeholder="Editor's Choice / Best Value / Top Rated" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-coupon">Coupon code</Label>
+              <Input id="pr-coupon" value={form.coupon} onChange={(e) => set('coupon', e.target.value)} placeholder="MNKP10" className="font-mono uppercase" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-couponnote">Coupon note</Label>
+              <Input id="pr-couponnote" value={form.couponNote} onChange={(e) => set('couponNote', e.target.value)} placeholder="10% off at checkout" />
+            </div>
+          </div>
+        )}
+
+        {tab === 'media' && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-image">Main image URL</Label>
+              <Input id="pr-image" value={form.image} onChange={(e) => set('image', e.target.value)} placeholder="https://…/product.jpg" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-gallery">Gallery — one image/GIF URL per line</Label>
+              <Textarea id="pr-gallery" value={form.gallery} onChange={(e) => set('gallery', e.target.value)} rows={4} placeholder={'https://…/front.jpg\nhttps://…/side.jpg\nhttps://…/demo.gif'} />
+              <p className="text-[11px] text-muted-foreground">Shown as a swipeable carousel on the product page. GIFs animate.</p>
+            </div>
+            {(form.image || form.gallery) && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-slim pb-2">
+                {[form.image, ...form.gallery.split('\n')].filter(Boolean).map((u, i) => (
+                  <div key={u + i} className="shrink-0 w-24 h-20 rounded-lg overflow-hidden bg-muted border border-border">
+                    { }
+                    <img src={u.trim()} alt="" className="size-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-buytext">Buy button text</Label>
+              <Input id="pr-buytext" value={form.buyText} onChange={(e) => set('buyText', e.target.value)} placeholder="Buy Now / Get this deal" />
+            </div>
+          </div>
+        )}
+
+        {tab === 'review' && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-pros">Pros — one per line</Label>
+              <Textarea id="pr-pros" value={form.pros} onChange={(e) => set('pros', e.target.value)} rows={3} placeholder={'Genuine value\nDaily-driver tested\nGreat support'} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-cons">Cons — one per line</Label>
+              <Textarea id="pr-cons" value={form.cons} onChange={(e) => set('cons', e.target.value)} rows={2} placeholder={'Premium price'} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-specs">Specifications — one per line as Key: Value</Label>
+              <Textarea id="pr-specs" value={form.specs} onChange={(e) => set('specs', e.target.value)} rows={3} placeholder={'Warranty: 1 year\nShipping: Pan-India\nReturns: 30-day'} />
+            </div>
+          </div>
+        )}
+
+        {tab === 'advanced' && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pr-disclosure">Custom disclosure</Label>
+              <Textarea id="pr-disclosure" value={form.disclosure} onChange={(e) => set('disclosure', e.target.value)} rows={2} placeholder="As an Amazon Associate, MN.KP earns from qualifying purchases." />
+              <p className="text-[11px] text-muted-foreground">Leave empty to use the default affiliate disclosure.</p>
+            </div>
+            {product && (
+              <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-2 text-xs">
+                <p className="flex justify-between"><span className="text-muted-foreground">Shareable URL</span><code className="text-primary">/#/store/item/{product.slug}</code></p>
+                <p className="flex justify-between"><span className="text-muted-foreground">Affiliate clicks</span><span className="font-semibold">{product.clicks.toLocaleString('en-IN')}</span></p>
+              </div>
+            )}
+          </div>
+        )}
+
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}><X className="size-4" /> Cancel</Button>
           <Button onClick={save} disabled={saving || !form.name || !form.affiliateUrl}>

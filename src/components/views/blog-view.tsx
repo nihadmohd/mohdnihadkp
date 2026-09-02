@@ -1,7 +1,7 @@
 'use client'
 
 // Blog — searchable, tag-filtered, paginated article grid
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, Fragment } from 'react'
 import { Search, Newspaper, Tag, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { CardSkeleton, SectionHeading } from '@/components/shared/section-heading'
 import { EmptyView, NoSearchResultsView, InlineError } from '@/components/views/states'
 import { PostCard } from '@/components/views/home-view'
+import { AdSlot } from '@/components/shared/ad-slot'
+import { MarqueeStrip } from '@/components/shared/marquee-strip'
 import { useSeo } from '@/hooks/use-seo'
 import { navigate } from '@/hooks/use-hash-router'
 import { api } from '@/lib/api-client'
@@ -83,6 +85,9 @@ export default function BlogView() {
         description="AI workflows, one-person business lessons, tool reviews and build logs — written between projects, from Calicut."
       />
 
+      {/* Scrolling highlights strip */}
+      <MarqueeStrip className="mt-7 mb-8" />
+
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-3 mb-7">
         <div className="relative flex-1 max-w-md">
@@ -129,7 +134,15 @@ export default function BlogView() {
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {data.posts.map((post, i) => (
-              <PostCard key={post.id} post={post as unknown as Record<string, unknown>} delay={i * 0.05} />
+              <Fragment key={post.id}>
+                <PostCard post={post as unknown as Record<string, unknown>} delay={i * 0.05} />
+                {/* Affiliate ad injected into the grid (after 3rd and 7th card) */}
+                {(i === 2 || i === 6) && (
+                  <div className="sm:col-span-2 lg:col-span-1 h-full">
+                    <AdSlot placement="blog-list" variant="card" className="[&>button]:h-full" />
+                  </div>
+                )}
+              </Fragment>
             ))}
           </div>
 

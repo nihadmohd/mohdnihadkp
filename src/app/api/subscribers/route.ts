@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth'
 import { ok, handleError, badRequest, validateEmail, parseIntParam } from '@/lib/api-helpers'
 import { emitAdminAlert } from '@/lib/realtime-emit'
+import { recordSubmission } from '@/lib/forms'
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,6 +40,12 @@ export async function POST(req: NextRequest) {
 
     await db.subscriber.create({ data: { email, name: String(body.name || '').trim() || null } })
     emitAdminAlert('subscriber', `New newsletter subscriber: ${email}`)
+    await recordSubmission({
+      formType: 'newsletter',
+      email,
+      name: String(body.name || '').trim() || null,
+      page: String(body.page || '/'),
+    })
 
     return ok({ success: true, message: 'Subscribed! Welcome aboard.' }, { status: 201 })
   } catch (err) {

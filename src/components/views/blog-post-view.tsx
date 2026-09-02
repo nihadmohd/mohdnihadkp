@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Markdown } from '@/components/markdown'
 import { InlineError, EmptyView } from '@/components/views/states'
 import { PostCard } from '@/components/views/home-view'
+import { AdSlot } from '@/components/shared/ad-slot'
 import { useSeo } from '@/hooks/use-seo'
 import { useSession } from '@/components/site/site-context'
 import { navigate } from '@/hooks/use-hash-router'
@@ -89,6 +90,30 @@ export default function BlogPostView({ slug }: { slug: string }) {
   useEffect(() => {
     load()
   }, [load])
+
+  // ── Accurate view counting ──────────────────────────────────
+  // One POST per post per mount, with a stable per-visitor session id.
+  // The server de-duplicates via the unique (postId, sessionId) ledger,
+  // so refreshes and return visits within the session don't inflate counts.
+  useEffect(() => {
+    if (!post?.id) return
+    let sid = ''
+    try {
+      sid = localStorage.getItem('nihad_sid') || ''
+      if (!sid) {
+        sid = (crypto.randomUUID ? crypto.randomUUID() : `s-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
+        localStorage.setItem('nihad_sid', sid)
+      }
+    } catch { /* private mode */ }
+    api<{ views: number; uniqueViews: number }>(`/api/posts/${post.id}/view`, {
+      method: 'POST',
+      body: { sessionId: sid || `anon-${Math.random().toString(36).slice(2)}` },
+    })
+      .then((d) => {
+        setPost((p) => (p && p.id === post.id ? { ...p, views: d.views } : p))
+      })
+      .catch(() => {})
+  }, [post?.id])
 
   useSeo(
     post
@@ -193,7 +218,9 @@ export default function BlogPostView({ slug }: { slug: string }) {
   const tags = post.tags.split(',').map((t) => t.trim()).filter(Boolean)
 
   return (
-    <article className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-8 sm:py-14 pb-24 lg:pb-14">
+    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-8 sm:py-14 pb-24 lg:pb-14">
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10 xl:gap-14">
+      <article className="min-w-0 max-w-3xl mx-auto lg:mx-0 w-full">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-7" aria-label="Breadcrumb">
         <button onClick={() => navigate('/')} className="hover:text-primary transition-colors">Home</button>
@@ -256,6 +283,9 @@ export default function BlogPostView({ slug }: { slug: string }) {
       <div className="mt-9">
         <Markdown content={post.content} />
       </div>
+
+      {/* Inline affiliate ad (admin-managed, blog-inline placement) */}
+      <AdSlot placement="blog-inline" variant="inline" className="mt-2" />
 
       {/* Author box */}
       <div className="mt-12 rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -361,6 +391,33 @@ export default function BlogPostView({ slug }: { slug: string }) {
           </div>
         </section>
       )}
-    </article>
+      </article>
+
+      {/* Desktop sidebar — sticky affiliate ads + quick links */}
+      <aside className="hidden lg:block" aria-label="Article sidebar">
+        <div className="sticky top-20 space-y-5">
+          <AdSlot placement="blog-sidebar" variant="sidebar" limit={2} />
+          {related.length > 0 && (
+            <nav className="rounded-2xl border border-border bg-card p-4" aria-label="More articles">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Keep reading</p>
+              <ul className="space-y-3">
+                {related.slice(0, 3).map((r) => (
+                  <li key={r.id}>
+                    <button
+                      onClick={() => navigate(`/blog/${r.slug}`)}
+                      className="text-left text-sm font-medium leading-snug hover:text-primary transition-colors line-clamp-2"
+                    >
+                      {r.title}
+                    </button>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{r.readingMinutes} min read</p>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>
+      </aside>
+      </div>
+    </div>
   )
 }

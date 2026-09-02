@@ -60,10 +60,77 @@ export const Markdown = memo(function Markdown({ content }: { content: string })
           th: ({ children }) => <th className="bg-muted px-4 py-2.5 text-left font-semibold border-b border-border">{children}</th>,
           td: ({ children }) => <td className="px-4 py-2.5 border-b border-border/50">{children}</td>,
           hr: () => <hr className="my-8 border-border" />,
-          img: ({ src, alt }) => (
-             
-            <img src={typeof src === 'string' ? src : ''} alt={alt || ''} loading="lazy" className="rounded-xl my-5 w-full" />
-          ),
+          // ── Media-aware image renderer ────────────────────────
+          // Blog content can embed images, GIFs and stickers via standard
+          // markdown ![alt](url). Special sizing is derived from the URL
+          // or the alt text:
+          //   alt starting with "sticker" → inline sticker (small, no block)
+          //   alt starting with "wide"    → full-bleed wide figure
+          //   *.gif / sticker path        → treated as animated embed
+          //   ![alt](url "caption")       → captioned figure
+          img: ({ src, alt, title }) => {
+            const url = typeof src === 'string' ? src : ''
+            const text = alt || ''
+            const isSticker = text.toLowerCase().startsWith('sticker') || /sticker/i.test(url)
+            const isWide = text.toLowerCase().startsWith('wide')
+            const isGif = /\.gif($|\?)/i.test(url) || /\/gif\//i.test(url)
+            const caption = typeof title === 'string' ? title : ''
+
+            if (isSticker) {
+              // Inline floating sticker — playful, small, sits in the text flow
+              return (
+                <span
+                  className="inline-block align-middle mx-1.5 my-1 animate-sticker-in"
+                  title={caption || text}
+                >
+                  { }
+                  <img
+                    src={url}
+                    alt={text}
+                    loading="lazy"
+                    className="size-12 sm:size-14 object-contain drop-shadow-md hover:scale-125 hover:rotate-6 transition-transform"
+                  />
+                </span>
+              )
+            }
+
+            if (isGif || isWide) {
+              // Animated GIF / wide media — full-width figure with caption
+              return (
+                <figure className="my-6">
+                  <span className="block rounded-2xl overflow-hidden border border-border bg-muted">
+                    { }
+                    <img
+                      src={url}
+                      alt={text}
+                      loading="lazy"
+                      className={`w-full ${isWide ? 'aspect-[21/9] object-cover' : 'object-contain max-h-[520px] mx-auto'}`}
+                    />
+                  </span>
+                  {caption && (
+                    <figcaption className="mt-2 text-center text-xs text-muted-foreground italic">
+                      {caption}
+                    </figcaption>
+                  )}
+                </figure>
+              )
+            }
+
+            // Regular image — rounded figure with optional caption
+            return (
+              <figure className="my-6">
+                <span className="block rounded-2xl overflow-hidden border border-border">
+                  { }
+                  <img src={url} alt={text} loading="lazy" className="w-full object-cover" />
+                </span>
+                {caption && (
+                  <figcaption className="mt-2 text-center text-xs text-muted-foreground italic">
+                    {caption}
+                  </figcaption>
+                )}
+              </figure>
+            )
+          },
         }}
       >
         {content}

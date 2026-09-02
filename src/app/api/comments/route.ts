@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
 import { ok, handleError, badRequest, parseIntParam } from '@/lib/api-helpers'
 import { emitAdminAlert } from '@/lib/realtime-emit'
+import { recordSubmission } from '@/lib/forms'
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     if (adminQueue) {
       const page = Math.max(1, parseIntParam(sp.get('page'), 1))
-      const limit = Math.min(50, parseIntParam(sp.get('limit'), 20))
+      const limit = Math.min(50, Math.max(1, parseIntParam(sp.get('limit'), 20)))
       const [comments, total, counts] = await Promise.all([
         db.comment.findMany({
           orderBy: { createdAt: 'desc' },
@@ -67,6 +68,15 @@ export async function POST(req: NextRequest) {
     })
 
     emitAdminAlert('comment', `New comment by ${user.name || user.email} on "${post.title}" (awaiting approval)`)
+    await recordSubmission({
+      formType: 'comment',
+      name: user.name,
+      email: user.email,
+      subject: `Comment on "${post.title}"`,
+      message: content,
+      data: { postId, commentId: comment.id },
+      page: `/blog/${post.slug}`,
+    })
 
     return ok(
       { success: true, message: 'Comment submitted! It will appear once approved.', comment: { id: comment.id } },
