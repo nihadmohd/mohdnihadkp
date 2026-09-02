@@ -3,8 +3,13 @@
 // ─────────────────────────────────────────────────────────────
 // Hash router — SPA navigation without page routes.
 // Routes look like: #/blog, #/blog/my-post, #/admin/posts
+//
+// Uses useSyncExternalStore so the SSR snapshot ('/') and the
+// client snapshot (real hash) can differ WITHOUT hydration
+// mismatch errors — React re-renders with the client value
+// immediately after hydration.
 // ─────────────────────────────────────────────────────────────
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useSyncExternalStore } from 'react'
 
 export interface RouteMatch {
   /** e.g. "/blog/my-post" (always starts with "/") */
@@ -43,24 +48,48 @@ export function navigate(path: string, opts: { replace?: boolean } = {}) {
   }
 }
 
+// ── Global store (single listener, cached snapshot) ──────────
+const SERVER_SNAPSHOT: RouteMatch = { path: '/', segments: [], query: {} }
+let cached: RouteMatch | null = null
+let listening = false
+const listeners = new Set<() => void>()
+
+function refreshSnapshot() {
+  cached = parseHash()
+  listeners.forEach((l) => l())
+}
+
+function ensureListener() {
+  if (listening || typeof window === 'undefined') return
+  listening = true
+  window.addEventListener('hashchange', () => {
+    refreshSnapshot()
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+  })
+}
+
+function subscribe(cb: () => void) {
+  ensureListener()
+  listeners.add(cb)
+  return () => {
+    listeners.delete(cb)
+  }
+}
+
+function getSnapshot(): RouteMatch {
+  if (!cached) cached = parseHash()
+  return cached
+}
+
+function getServerSnapshot(): RouteMatch {
+  return SERVER_SNAPSHOT
+}
+
 export function useHashRouter(): RouteMatch & {
   navigate: typeof navigate
   back: () => void
 } {
-  const [route, setRoute] = useState<RouteMatch>(() =>
-    typeof window === 'undefined'
-      ? { path: '/', segments: [], query: {} }
-      : parseHash()
-  )
-
-  useEffect(() => {
-    const onChange = () => {
-      setRoute(parseHash())
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-    }
-    window.addEventListener('hashchange', onChange)
-    return () => window.removeEventListener('hashchange', onChange)
-  }, [])
+  const route = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
   const back = useCallback(() => {
     if (window.history.length > 1) window.history.back()

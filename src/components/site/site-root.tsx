@@ -235,6 +235,7 @@ export default function SiteRoot({ initial }: { initial: InitialData }) {
         return <LegalView slug="privacy-policy" />
       }
       case 'login':
+      case 'admin-login':
       case 'register':
       case 'verify-email':
       case 'forgot-password':

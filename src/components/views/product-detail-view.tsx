@@ -77,9 +77,21 @@ function Stars({ rating, count }: { rating: number | null; count?: number | null
   )
 }
 
+interface RelatedProduct {
+  id: string
+  name: string
+  slug: string
+  image: string | null
+  price: number | null
+  rating: number | null
+  merchant: string | null
+  badge: string | null
+  source: string
+}
+
 export default function ProductDetailView({ slug }: { slug: string }) {
   const [product, setProduct] = useState<ProductRow | null>(null)
-  const [related, setRelated] = useState<Array<{ id: string; name: string; slug: string; image: string | null; price: number | null; rating: number | null; merchant: string | null; badge: string | null; source: string }>([])
+  const [related, setRelated] = useState<RelatedProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeImage, setActiveImage] = useState(0)
@@ -100,7 +112,7 @@ export default function ProductDetailView({ slug }: { slug: string }) {
     setLoading(true)
     setError('')
     try {
-      const res = await api<{ product: ProductRow; related: typeof related }>(
+      const res = await api<{ product: ProductRow; related: RelatedProduct[] }>(
         `/api/products?slug=${encodeURIComponent(slug)}`
       )
       setProduct(res.product)

@@ -93,6 +93,7 @@ export interface SessionUser {
   emailVerified: Date | null
   onboarded: boolean
   plan: string
+  planRenewsAt?: Date | null
   banned: boolean
 }
 
@@ -113,6 +114,7 @@ export async function getSession(): Promise<SessionUser | null> {
     emailVerified: user.emailVerified,
     onboarded: user.onboarded,
     plan: user.plan,
+    planRenewsAt: user.planRenewsAt,
     banned: user.banned,
   }
 }

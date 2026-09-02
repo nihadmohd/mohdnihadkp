@@ -22,7 +22,7 @@ import { LiveBadge } from '@/components/site/live-badge'
 
 interface NavProps {
   route: { path: string; segments: string[] }
-  announcement: string
+  announcement?: string
   onCommand: () => void
 }
 

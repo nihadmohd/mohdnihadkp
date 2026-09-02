@@ -72,7 +72,7 @@ export function applySeo(data: SeoData) {
   upsertLink('canonical', url)
 
   // JSON-LD
-  const existing = document.getElementById(JSONLD_ID)
+  const existing = document.getElementById(JSONLD_ID) as HTMLScriptElement | null
   const script = existing || document.createElement('script')
   script.id = JSONLD_ID
   script.type = 'application/ld+json'

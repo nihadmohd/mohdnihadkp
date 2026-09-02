@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
     const subject = String(body.subject || '').trim()
     const budget = String(body.budget || '').trim()
     const serviceId = String(body.serviceId || '').trim() || null
+    const page = String(body.page || '').trim() || null
 
     if (!name) return badRequest('Please enter your name.')
     if (!validateEmail(email)) return badRequest('Please enter a valid email so I can reply.')
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
       name, email, phone: phone || null,
       subject: subject || 'General inquiry',
       message,
+      page: page || '/contact',
       data: { budget: budget || null, serviceId, source: 'inquiry form' },
     })
 

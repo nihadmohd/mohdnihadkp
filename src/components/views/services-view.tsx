@@ -203,6 +203,7 @@ export function InquiryDialog({
         body: {
           name, email, phone, subject, budget, message,
           serviceId: service?.id || null,
+          page: window.location.hash.replace(/^#/, '') || '/',
         },
       })
       setDone(true)

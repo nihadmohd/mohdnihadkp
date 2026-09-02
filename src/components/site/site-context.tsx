@@ -14,6 +14,8 @@ export interface SessionUser {
   emailVerified: Date | string | null
   onboarded: boolean
   plan: string
+  planRenewsAt?: Date | string | null
+  banned?: boolean
 }
 
 export interface SiteSettings {

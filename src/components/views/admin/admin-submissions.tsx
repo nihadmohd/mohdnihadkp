@@ -58,8 +58,8 @@ function timeAgo(iso: string): string {
 
 export default function AdminSubmissions() {
   const [submissions, setSubmissions] = useState<SubmissionRow[]>([])
-  const [counts, setCounts] = useState<Record<string, number>>({})
-  const [byType, setByType] = useState<Record<string, number>>({})
+  const [byType, setByType] = useState<Array<{ type: string; count: number }>>([])
+  const [newCount, setNewCount] = useState(0)
   const [type, setType] = useState('')
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
@@ -79,14 +79,18 @@ export default function AdminSubmissions() {
         submissions: SubmissionRow[]
         total: number
         pages: number
-        byType: Record<string, number>
-        counts: Record<string, number>
+        byType: Array<{ type: string; count: number }>
+        byStatus: Array<{ status: string; count: number }>
       }>(`/api/submissions?${params}`)
       setSubmissions(res.submissions)
       setTotal(res.total)
       setPages(res.pages)
-      setByType(res.byType || {})
-      setCounts(res.counts || {})
+      setByType(Array.isArray(res.byType) ? res.byType : [])
+      setNewCount(
+        Array.isArray(res.byStatus)
+          ? res.byStatus.find((s) => s.status === 'NEW')?.count ?? 0
+          : 0
+      )
     } catch (err) {
       toast({ title: 'Failed to load', description: (err as Error).message, variant: 'destructive' })
     } finally {
@@ -126,7 +130,7 @@ export default function AdminSubmissions() {
     URL.revokeObjectURL(url)
   }
 
-  const totalNew = counts.NEW || 0
+  const totalNew = newCount
 
   return (
     <div className="space-y-5">
@@ -161,7 +165,7 @@ export default function AdminSubmissions() {
           >
             All ({total})
           </button>
-          {Object.entries(byType).map(([t, c]) => (
+          {byType.map(({ type: t, count: c }) => (
             <button
               key={t}
               onClick={() => setType(type === t ? '' : t)}

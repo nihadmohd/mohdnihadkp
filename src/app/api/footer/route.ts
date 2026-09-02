@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const adminView = req.nextUrl.searchParams.get('admin') === 'true'
     const links = await db.footerLink.findMany({
       where: adminView ? {} : { active: true },
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      orderBy: { sortOrder: 'asc' },
       take: 80,
     })
     return ok({ links })

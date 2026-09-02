@@ -190,17 +190,14 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                       ))}
                     </div>
                     <div className="grid grid-cols-3 gap-2 pt-2">
-                      {[
+                      {([
                         ['AI', Cpu], ['Media', Camera], ['Business', TrendingUp],
-                      ].map(([label, Icon]: [string, unknown]) => {
-                        const I = Icon as typeof Cpu
-                        return (
-                          <div key={label as string} className="rounded-xl border border-border bg-background/40 p-3 text-center">
-                            <I className="size-4 mx-auto text-primary" aria-hidden />
-                            <p className="text-[11px] font-medium mt-1.5">{label as string}</p>
-                          </div>
-                        )
-                      })}
+                      ] as Array<[string, typeof Cpu]>).map(([label, I]) => (
+                        <div key={label} className="rounded-xl border border-border bg-background/40 p-3 text-center">
+                          <I className="size-4 mx-auto text-primary" aria-hidden />
+                          <p className="text-[11px] font-medium mt-1.5">{label}</p>
+                        </div>
+                      ))}
                     </div>
                     <Button className="w-full" onClick={() => navigate('/about')}>
                       The full story <ChevronRight className="size-4" />
@@ -278,11 +275,11 @@ export default function HomeView({ initial }: { initial: InitialData }) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-display font-bold text-lg leading-snug">{String(svc.title)}</h3>
-                  {svc.priceFrom && (
+                  {svc.priceFrom ? (
                     <Badge variant="secondary" className="shrink-0 text-primary border-primary/30">
                       {String(svc.priceFrom)}+
                     </Badge>
-                  )}
+                  ) : null}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2.5 leading-relaxed line-clamp-3">
                   {String(svc.description).slice(0, 140)}

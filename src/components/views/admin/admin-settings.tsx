@@ -77,7 +77,7 @@ export default function AdminSettings() {
     setSaving(true)
     try {
       await api('/api/settings', { method: 'PUT', body: { settings: form } })
-      updateSettings(form)
+      updateSettings({ ...form } as Record<string, string | undefined>)
       toast({ title: 'Settings saved', description: 'Changes are live on the site right now.' })
     } catch (err) {
       toast({ title: 'Save failed', description: (err as Error).message, variant: 'destructive' })

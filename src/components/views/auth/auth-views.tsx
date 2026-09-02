@@ -182,6 +182,10 @@ function LoginView() {
           <button onClick={() => navigate('/register')} className="text-primary font-medium hover:underline">
             Create a free account
           </button>
+          <span className="mx-1.5 text-border" aria-hidden>·</span>
+          <button onClick={() => navigate('/admin-login')} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
+            Admin entrance
+          </button>
         </>
       }
     >
@@ -212,6 +216,76 @@ function LoginView() {
           {loading ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
           Sign in
         </Button>
+      </form>
+    </AuthShell>
+  )
+}
+
+// ─── ADMIN LOGIN (gold theme) ────────────────────────────────
+function AdminLoginView() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { setUser } = useSession()
+  useSeo({ title: 'Admin & Developer Access', description: 'Restricted admin console sign-in.', path: '/admin-login', noindex: true }, ['admin-login'])
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
+    setError('')
+    setLoading(true)
+    try {
+      const res = await api<{ user: SessionUser }>('/api/auth/admin-login', {
+        method: 'POST',
+        body: { email, password },
+      })
+      setUser(res.user)
+      navigate('/admin')
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <AuthShell
+      theme="gold"
+      badge="Restricted Access"
+      icon={<TerminalSquare className="size-6" />}
+      title="Admin & Developer"
+      subtitle="Sign in to the control console — full site management, analytics and content tools."
+      footer={
+        <>
+          Not an admin?{' '}
+          <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">
+            Use the user sign-in
+          </button>
+        </>
+      }
+    >
+      <form onSubmit={submit} className="space-y-4">
+        <FormError message={error} />
+        <div className="space-y-1.5">
+          <Label htmlFor="admin-email">Admin email</Label>
+          <Input
+            id="admin-email" type="email" required autoComplete="email"
+            value={email} onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@nihadkp.com"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="admin-password">Password</Label>
+          <PasswordInput id="admin-password" value={password} onChange={setPassword} />
+        </div>
+        <Button type="submit" className={`w-full h-11 ${'bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:from-amber-400 hover:to-amber-500 font-bold shadow-lg shadow-amber-500/30'}`} disabled={loading}>
+          {loading ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+          Enter console
+        </Button>
+        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+          Only ADMIN accounts can enter here — regular users are redirected to the main sign-in.
+        </p>
       </form>
     </AuthShell>
   )
@@ -553,11 +627,12 @@ function ResetPasswordView({ token }: { token: string }) {
 export default function AuthViews({
   view, token,
 }: {
-  view: 'login' | 'register' | 'verify-email' | 'forgot-password' | 'reset-password'
+  view: 'login' | 'admin-login' | 'register' | 'verify-email' | 'forgot-password' | 'reset-password'
   token?: string
 }) {
   switch (view) {
     case 'login': return <LoginView />
+    case 'admin-login': return <AdminLoginView />
     case 'register': return <RegisterView />
     case 'verify-email': return <VerifyEmailView token={token || ''} />
     case 'forgot-password': return <ForgotPasswordView />
