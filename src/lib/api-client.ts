@@ -34,6 +34,7 @@ export async function api<T = unknown>(
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
     credentials: 'same-origin',
+    cache: 'no-store',
     signal,
   })
 

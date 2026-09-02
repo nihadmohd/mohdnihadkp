@@ -2,6 +2,7 @@
 import { getSession } from '@/lib/auth'
 import { ok, handleError } from '@/lib/api-helpers'
 
+export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const session = await getSession()
