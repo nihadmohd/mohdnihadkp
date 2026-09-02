@@ -20,6 +20,10 @@ export function badRequest(message: string) {
   return fail(400, message)
 }
 
+export function notFound(message: string) {
+  return fail(404, message)
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export function validateEmail(email: string): boolean {
   return EMAIL_RE.test(email)

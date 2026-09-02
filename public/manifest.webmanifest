@@ -1,11 +1,11 @@
 {
-  "name": "Mohammed Nihad KP — AI-Powered Developer & Digital Creator",
-  "short_name": "Nihad KP",
-  "description": "Portfolio, blog, store and services of Mohammed Nihad KP — freelancer, businessman and AI-driven developer from Calicut, Kerala.",
+  "name": "MN.KP — Mohammed Nihad KP",
+  "short_name": "MN.KP",
+  "description": "MN.KP — portfolio, blog, affiliate store and services of Mohammed Nihad KP. AI-powered developer & digital creator from Calicut, Kerala.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d1512",
-  "theme_color": "#0d1512",
+  "background_color": "#0c1210",
+  "theme_color": "#0c1210",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -15,10 +15,16 @@
       "purpose": "any"
     },
     {
-      "src": "/avatar.png",
-      "sizes": "1024x1024",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [

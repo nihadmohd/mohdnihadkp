@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth'
 import { ok, handleError, badRequest, validateEmail, parseIntParam } from '@/lib/api-helpers'
 import { emitAdminAlert } from '@/lib/realtime-emit'
+import { recordSubmission } from '@/lib/forms'
 
 export async function GET(req: NextRequest) {
   try {
@@ -62,6 +63,16 @@ export async function POST(req: NextRequest) {
 
     const inquiry = await db.inquiry.create({
       data: { name, email, message, phone: phone || null, subject: subject || null, budget: budget || null, serviceId },
+    })
+
+    // Mirror into the unified submissions table so every form the
+    // visitor fills is visible in the admin Submissions section.
+    await recordSubmission({
+      formType: serviceId ? 'service-inquiry' : 'contact',
+      name, email, phone: phone || null,
+      subject: subject || 'General inquiry',
+      message,
+      data: { budget: budget || null, serviceId, source: 'inquiry form' },
     })
 
     if (serviceId) {

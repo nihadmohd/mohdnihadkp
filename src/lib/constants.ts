@@ -3,18 +3,22 @@
 // ─────────────────────────────────────────────────────────────
 
 export const SITE = {
-  name: 'Mohammed Nihad KP',
-  shortName: 'Nihad KP',
-  initials: 'MNKP',
+  name: 'MN.KP',
+  fullName: 'Mohammed Nihad KP',
+  shortName: 'MN.KP',
+  initials: 'MN',
   tagline: 'AI-Powered Developer & Digital Creator',
   description:
-    'I build apps, websites, and digital solutions — not by writing every line of code from scratch, but by mastering the AI tools of tomorrow. Freelancer, businessman and developer from Calicut, Kerala.',
+    'MN.KP — the platform of Mohammed Nihad KP. I build apps, websites, and digital solutions by mastering the AI tools of tomorrow. Freelancer, businessman and developer from Calicut, Kerala.',
   url: 'https://nihadkp.com',
   locale: 'en_IN',
   location: 'Calicut, Kerala, India',
   email: 'hello@nihadkp.com',
   whatsappNumber: '919846750898',
   brand: 'KP Foundation',
+  logo: '/logo.svg',
+  logoPng: '/logo.png',
+  icon: '/icon.svg',
 }
 
 export const SOCIALS = [

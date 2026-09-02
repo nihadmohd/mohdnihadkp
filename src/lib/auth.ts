@@ -3,7 +3,7 @@
 // No external deps — uses Node crypto only.
 // ─────────────────────────────────────────────────────────────
 import crypto from 'crypto'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { db } from '@/lib/db'
 
 const SECRET =
@@ -119,10 +119,19 @@ export async function getSession(): Promise<SessionUser | null> {
 
 export async function setSessionCookie(token: string) {
   const store = await cookies()
+  // Detect HTTPS via the gateway's forwarded proto header.
+  const hdrs = await headers()
+  const proto = (hdrs.get('x-forwarded-proto') || 'http').split(',')[0].trim()
+  const isHttps = proto === 'https'
+  // IMPORTANT: when the site is viewed inside an embedded webview/iframe
+  // (e.g. IM preview panels), browsers reject SameSite=Lax cookies entirely,
+  // which breaks the session right after login ("session expired").
+  // SameSite=None (requires Secure) works in BOTH embedded and top-level
+  // contexts over HTTPS, so we use it whenever we are on HTTPS.
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: isHttps ? 'none' : 'lax',
+    secure: isHttps,
     maxAge: SESSION_DAYS * 24 * 3600,
     path: '/',
   })
@@ -130,7 +139,15 @@ export async function setSessionCookie(token: string) {
 
 export async function clearSessionCookie() {
   const store = await cookies()
-  store.set(SESSION_COOKIE, '', { httpOnly: true, maxAge: 0, path: '/' })
+  const hdrs = await headers()
+  const isHttps = (hdrs.get('x-forwarded-proto') || 'http').split(',')[0].trim() === 'https'
+  store.set(SESSION_COOKIE, '', {
+    httpOnly: true,
+    sameSite: isHttps ? 'none' : 'lax',
+    secure: isHttps,
+    maxAge: 0,
+    path: '/',
+  })
 }
 
 // ── Guard helpers for API routes ─────────────────────────────

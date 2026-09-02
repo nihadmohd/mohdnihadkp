@@ -30,8 +30,8 @@ export async function GET(req: NextRequest) {
       if (!post || (!post.published && !adminView)) {
         return badRequest('Post not found.')
       }
-      // Increment views (fire and forget)
-      db.post.update({ where: { id: post.id }, data: { views: { increment: 1 } } }).catch(() => {})
+      // Note: view counting is handled by POST /api/posts/[id]/view
+      // (de-duplicated per visitor session) — nothing to do here.
       return ok({ post })
     }
 

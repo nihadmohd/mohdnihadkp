@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   keywords: [
+    "MN.KP",
     "Mohammed Nihad KP",
     "Nihad KP",
     "AI developer Calicut",
@@ -46,8 +47,11 @@ export const metadata: Metadata = {
   formatDetection: { email: false, address: false, telephone: false },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: "/favicon.png", type: "image/png", sizes: "48x48" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
   alternates: { canonical: "/" },
   openGraph: {

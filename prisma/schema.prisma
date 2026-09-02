@@ -93,11 +93,25 @@ model Product {
   slug         String   @unique
   description  String   @default("")
   image        String?
+  gallery      String   @default("") // pipe separated image/gif URLs
   price        Float?
+  listPrice    Float?   // strikethrough original price
+  currency     String   @default("INR")
   rating       Float?
+  ratingCount Int?
   merchant     String?
+  brand        String?
+  source       String   @default("CUSTOM") // AMAZON | FLIPKART | EBAY | ALIEXPRESS | CUSTOM
   category     String   @default("General")
   affiliateUrl String
+  badge        String?   // e.g. "Best Value" | "Editor's Choice"
+  coupon       String?   // coupon code
+  couponNote   String?   // e.g. "10% off at checkout"
+  pros         String   @default("") // pipe separated
+  cons         String   @default("") // pipe separated
+  specs        String   @default("") // "key:value|key:value"
+  buyText      String   @default("Buy Now")
+  disclosure   String?
   featured     Boolean  @default(false)
   active       Boolean  @default(true)
   clicks       Int      @default(0)
@@ -106,6 +120,94 @@ model Product {
   updatedAt    DateTime @updatedAt
 
   @@index([active, category])
+}
+
+// Media library — images, GIFs and stickers the admin uploads / links.
+// Usable in blog posts, product galleries, marquee strips and ad units.
+model Media {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  type      String   @default("image") // image | gif | sticker
+  alt       String?
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+
+  @@index([type])
+}
+
+// Scrolling image strip (marquee) shown on home / store / blog tops.
+model MarqueeItem {
+  id        String   @id @default(cuid())
+  title     String?
+  imageUrl  String
+  linkUrl   String?
+  badge     String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// Affiliate ad units — admin-controlled ad placements rendered across
+// the site (home, blog list, blog article, store, services, footer).
+// Either a standalone banner or a pointer to a Product (productId).
+model AdUnit {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  linkUrl     String?
+  productId   String?
+  badge       String?
+  placement   String   @default("sidebar") // home | blog-list | blog-inline | blog-sidebar | store | services | footer
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([placement, active])
+}
+
+// Admin-editable footer navigation.
+model FooterLink {
+  id        String   @id @default(cuid())
+  section   String   @default("main") // main | explore | ventures | legal
+  label     String
+  url       String   @default("") // empty = hash route via client, external http(s) = new tab
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+}
+
+// Every form a visitor fills lands here so the admin sees all
+// submissions with full contact details in one place.
+model FormSubmission {
+  id        String   @id @default(cuid())
+  formType  String // contact | newsletter | inquiry | comment | support | service-inquiry
+  name      String?
+  email     String?
+  phone     String?
+  subject   String?
+  message   String?
+  data      String   @default("{}") // JSON blob with extra fields (budget, service, page…)
+  page      String?
+  status    String   @default("NEW") // NEW | READ | DONE
+  createdAt DateTime @default(now())
+
+  @@index([formType, createdAt])
+  @@index([status])
+}
+
+// Unique blog view ledger — one row per post per visitor session,
+// giving exact, de-duplicated view counts.
+model PostView {
+  id        String   @id @default(cuid())
+  postId    String
+  sessionId String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, sessionId])
+  @@index([postId])
 }
 
 model Service {
