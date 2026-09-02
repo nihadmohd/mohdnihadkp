@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Newspaper, ShoppingBag, Briefcase, Inbox, MessageSquare, Users,
   MailCheck, ChartLine, LifeBuoy, Settings, LogOut, Bell, Menu, ExternalLink,
-  Radio, Megaphone, Images, Sticker, ClipboardList, PanelBottom, TerminalSquare,
+  Radio, Megaphone, Images, Sticker, ClipboardList, PanelBottom, TerminalSquare, Network,
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,9 +15,9 @@ import { useToast } from '@/hooks/use-toast'
 import { navigate } from '@/hooks/use-hash-router'
 import { api } from '@/lib/api-client'
 import { useSession } from '@/components/site/site-context'
+import { useRealtimeFeed } from '@/components/site/live-badge'
 import { useSeo } from '@/hooks/use-seo'
 import { ADMIN_ROUTES } from '@/lib/constants'
-import type { ActivityEntry, AdminAlert } from '@/hooks/use-realtime'
 import AdminDashboard from '@/components/views/admin/admin-dashboard'
 import AdminPosts from '@/components/views/admin/admin-posts'
 import AdminProducts from '@/components/views/admin/admin-products'
@@ -34,25 +34,25 @@ import AdminAnalytics from '@/components/views/admin/admin-analytics'
 import AdminFooter from '@/components/views/admin/admin-footer'
 import AdminSupport from '@/components/views/admin/admin-support'
 import AdminSettings from '@/components/views/admin/admin-settings'
+import AdminVentures from '@/components/views/admin/admin-ventures'
 
 const SECTION_ICONS: Record<string, LucideIcon> = {
   'layout-dashboard': LayoutDashboard, newspaper: Newspaper, 'shopping-bag': ShoppingBag,
   megaphone: Megaphone, images: Images, sticker: Sticker, 'clipboard-list': ClipboardList,
-  'panel-bottom': PanelBottom,
+  'panel-bottom': PanelBottom, network: Network,
   briefcase: Briefcase, inbox: Inbox, 'message-square': MessageSquare, users: Users,
   'mail-check': MailCheck, 'chart-line': ChartLine, 'life-buoy': LifeBuoy, settings: Settings,
 }
 
 export default function AdminView({
-  section, sub, onAlerts, feed,
+  section, sub,
 }: {
   section: string
   sub?: string
-  onAlerts: AdminAlert[]
-  feed: ActivityEntry[]
 }) {
   const { user, setUser } = useSession()
   const { toast } = useToast()
+  const { feed, alerts: onAlerts } = useRealtimeFeed()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
 
@@ -89,6 +89,7 @@ export default function AdminView({
       case 'marquee': return <AdminMarquee />
       case 'media': return <AdminMedia />
       case 'services': return <AdminServices />
+      case 'ventures': return <AdminVentures />
       case 'inquiries': return <AdminInquiries />
       case 'submissions': return <AdminSubmissions />
       case 'comments': return <AdminComments />

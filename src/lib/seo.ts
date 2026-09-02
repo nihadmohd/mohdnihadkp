@@ -1,10 +1,15 @@
 'use client'
 
 // ─────────────────────────────────────────────────────────────
-// Client-side SEO manager — per-route <head> updates
-// Updates title, meta description, canonical, OG/Twitter, JSON-LD
+// Client-side SEO manager — dynamic <head> updates for
+// client-rendered states (post loaded via API, etc.).
+// Server routes already emit static metadata + JSON-LD via
+// generateMetadata; this keeps the SPA feel in sync.
 // ─────────────────────────────────────────────────────────────
 import { SITE } from '@/lib/constants'
+import { personJsonLd, websiteJsonLd } from '@/lib/seo-metadata'
+
+export { personJsonLd, websiteJsonLd }
 
 export interface SeoData {
   title: string
@@ -44,8 +49,10 @@ const JSONLD_ID = 'dynamic-jsonld'
 export function applySeo(data: SeoData) {
   if (typeof document === 'undefined') return
 
-  const fullTitle = data.title.includes(SITE.name) ? data.title : `${data.title} | ${SITE.name}`
-  const url = `${SITE.url}/#${data.path || '/'}`
+  const fullTitle = data.title.includes(SITE.name) || data.title.includes('MN.KP')
+    ? data.title
+    : `${data.title} | ${SITE.name}`
+  const url = `${SITE.url}${data.path || '/'}`
 
   document.title = fullTitle
 
@@ -71,64 +78,28 @@ export function applySeo(data: SeoData) {
   // Canonical
   upsertLink('canonical', url)
 
-  // JSON-LD
+  // JSON-LD (supplemental — server routes emit the full graph)
   const existing = document.getElementById(JSONLD_ID) as HTMLScriptElement | null
-  const script = existing || document.createElement('script')
-  script.id = JSONLD_ID
-  script.type = 'application/ld+json'
-  const graph = [
-    data.jsonLd,
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE.url}/` },
-        ...(data.path && data.path !== '/'
-          ? [{ '@type': 'ListItem', position: 2, name: data.title, item: url }]
-          : []),
-      ],
-    },
-  ].filter(Boolean)
-  script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
-  if (!existing) document.head.appendChild(script)
-}
-
-// Baseline structured data (rendered once, merged with per-route data)
-export function personJsonLd() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: SITE.name,
-    alternateName: SITE.shortName,
-    jobTitle: SITE.tagline,
-    description: SITE.description,
-    url: SITE.url,
-    email: SITE.email,
-    address: { '@type': 'PostalAddress', addressLocality: 'Calicut', addressRegion: 'Kerala', addressCountry: 'IN' },
-    sameAs: [
-      'https://www.instagram.com/mohdnihadkp',
-      'https://www.linkedin.com/in/mohammed-nihad-kp-71b6b6339',
-      'https://x.com/mohdnihadkp',
-      'https://www.threads.com/@mohdnihadkp',
-      'https://pin.it/4SKTJurgS',
-      'https://www.facebook.com/profile.php?id=61589286702060',
-    ],
-    knowsAbout: ['AI Development', 'Web Development', 'Photography', 'Videography', 'Digital Marketing'],
-  }
-}
-
-export function websiteJsonLd() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SITE.name,
-    url: SITE.url,
-    description: SITE.description,
-    author: { '@type': 'Person', name: SITE.name },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE.url}/#/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
+  if (data.jsonLd) {
+    const script = existing || document.createElement('script')
+    script.id = JSONLD_ID
+    script.type = 'application/ld+json'
+    const graph = [
+      data.jsonLd,
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE.url}/` },
+          ...(data.path && data.path !== '/'
+            ? [{ '@type': 'ListItem', position: 2, name: data.title, item: url }]
+            : []),
+        ],
+      },
+    ].filter(Boolean)
+    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
+    if (!existing) document.head.appendChild(script)
+  } else if (existing) {
+    existing.remove()
   }
 }

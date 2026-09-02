@@ -4,7 +4,7 @@
 // Add by URL, copy markdown snippets for the blog editor, delete.
 import { useCallback, useEffect, useState } from 'react'
 import {
-  ImageIcon, Plus, Trash2, Loader2, Copy, Search, Sparkles, Sticker, Film,
+  ImageIcon, Plus, Trash2, Loader2, Copy, Search, Sparkles, Sticker, Film, Pencil,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,6 +42,7 @@ export default function AdminMedia() {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [editing, setEditing] = useState<MediaRow | null>(null)
   const [form, setForm] = useState({ name: '', url: '', type: 'image', alt: '' })
   const { toast } = useToast()
 
@@ -59,13 +60,31 @@ export default function AdminMedia() {
 
   useEffect(() => { load() }, [load])
 
+  const openCreate = () => {
+    setEditing(null)
+    setForm({ name: '', url: '', type: 'image', alt: '' })
+    setOpen(true)
+  }
+
+  const openEdit = (m: MediaRow) => {
+    setEditing(m)
+    setForm({ name: m.name, url: m.url, type: m.type, alt: m.alt || '' })
+    setOpen(true)
+  }
+
   const save = async () => {
     if (saving) return
     setSaving(true)
     try {
-      await api('/api/media', { method: 'POST', body: form })
-      toast({ title: 'Media added', description: `${form.name} is now in the library.` })
+      if (editing) {
+        await api(`/api/media/${editing.id}`, { method: 'PATCH', body: form })
+        toast({ title: 'Media updated', description: `${form.name} re-edited — new details are live.` })
+      } else {
+        await api('/api/media', { method: 'POST', body: form })
+        toast({ title: 'Media added', description: `${form.name} is now in the library.` })
+      }
       setOpen(false)
+      setEditing(null)
       setForm({ name: '', url: '', type: 'image', alt: '' })
       load()
     } catch (err) {
@@ -108,7 +127,7 @@ export default function AdminMedia() {
             Images, GIFs and stickers for blog posts and product galleries — copy a markdown snippet to insert anywhere.
           </p>
         </div>
-        <Button size="sm" onClick={() => setOpen(true)}>
+        <Button size="sm" onClick={openCreate}>
           <Plus className="size-4" /> Add media
         </Button>
       </div>
@@ -142,7 +161,7 @@ export default function AdminMedia() {
           title="Library is empty"
           message="Add images, GIFs and stickers by URL — they become instantly insertable in the blog editor and product galleries."
           icon={<Sparkles className="size-7 text-muted-foreground" />}
-          action={<Button size="sm" onClick={() => setOpen(true)}><Plus className="size-4" /> Add media</Button>}
+          action={<Button size="sm" onClick={openCreate}><Plus className="size-4" /> Add media</Button>}
         />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -165,6 +184,9 @@ export default function AdminMedia() {
                     <Button size="sm" variant="outline" className="h-7 text-xs flex-1" onClick={() => copyMarkdown(m)}>
                       <Copy className="size-3" /> Markdown
                     </Button>
+                    <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => openEdit(m)} aria-label={`Edit ${m.name}`}>
+                      <Pencil className="size-3" />
+                    </Button>
                     <Button size="sm" variant="outline" className="h-7 text-xs px-2 hover:border-destructive/50 hover:text-destructive" onClick={() => remove(m)} aria-label={`Delete ${m.name}`}>
                       <Trash2 className="size-3" />
                     </Button>
@@ -176,13 +198,15 @@ export default function AdminMedia() {
         </div>
       )}
 
-      {/* Add dialog */}
+      {/* Add / edit dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add media</DialogTitle>
+            <DialogTitle>{editing ? `Edit — ${editing.name}` : 'Add media'}</DialogTitle>
             <DialogDescription>
-              Link an image, GIF or sticker by URL. Local paths like <code className="text-xs bg-muted px-1 rounded">/sticker-rocket.png</code> work too.
+              {editing
+                ? 'Re-edit the name, type, URL or alt text — changes apply everywhere it is used.'
+                : <>Link an image, GIF or sticker by URL. Local paths like <code className="text-xs bg-muted px-1 rounded">/sticker-rocket.png</code> work too.</>}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -205,7 +229,8 @@ export default function AdminMedia() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="media-url">URL</Label>
-              <Input id="media-url" value={form.url} onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))} placeholder="https://… or /image.png" />
+              <Input id="media-url" value={form.url} onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))} placeholder="https://… or /image.png" disabled={Boolean(editing)} />
+              {editing && <p className="text-[11px] text-muted-foreground">URL is fixed after creation (media already inserted keeps working).</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="media-alt">Alt text (optional)</Label>
@@ -220,7 +245,7 @@ export default function AdminMedia() {
           </div>
           <DialogFooter>
             <Button onClick={save} disabled={saving || !form.name || !form.url}>
-              {saving ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />} Add to library
+              {saving ? <Loader2 className="size-4 animate-spin" /> : editing ? <Pencil className="size-4" /> : <Plus className="size-4" />} {editing ? 'Save changes' : 'Add to library'}
             </Button>
           </DialogFooter>
         </DialogContent>

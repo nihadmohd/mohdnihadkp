@@ -21,7 +21,7 @@ import { api } from '@/lib/api-client'
 import { useToast } from '@/hooks/use-toast'
 import { AdSlot } from '@/components/shared/ad-slot'
 
-interface ProductRow {
+export interface ProductRow {
   id: string
   name: string
   slug: string
@@ -89,10 +89,11 @@ interface RelatedProduct {
   source: string
 }
 
-export default function ProductDetailView({ slug }: { slug: string }) {
-  const [product, setProduct] = useState<ProductRow | null>(null)
+export default function ProductDetailView({ slug, initial }: { slug: string; initial?: ProductRow | null }) {
+  const [product, setProduct] = useState<ProductRow | null>(initial || null)
   const [related, setRelated] = useState<RelatedProduct[]>([])
-  const [loading, setLoading] = useState(true)
+  const [posts, setPosts] = useState<Array<{ id: string; title: string; slug: string; excerpt: string | null; readingMinutes: number }>>([])
+  const [loading, setLoading] = useState(!initial)
   const [error, setError] = useState('')
   const [activeImage, setActiveImage] = useState(0)
   const [copied, setCopied] = useState(false)
@@ -100,16 +101,17 @@ export default function ProductDetailView({ slug }: { slug: string }) {
 
   useSeo(
     {
-      title: product ? `${product.name} — Store` : 'Product — Store',
-      description: product?.description?.slice(0, 160) || 'A curated affiliate pick from the MN.KP store.',
-      path: `/store/item/${slug}`,
+      title: product ? `${product.name} — Review, Price & Best Deal` : 'Product — Store',
+      description: product?.description?.slice(0, 160) || 'A curated affiliate pick from the MN.KP store — honestly reviewed with prices, pros and cons.',
+      path: `/store/${slug}`,
       type: 'article',
+      image: product?.image || undefined,
     },
     [slug, product?.name]
   )
 
   const load = useCallback(async () => {
-    setLoading(true)
+    if (!initial) setLoading(true)
     setError('')
     try {
       const res = await api<{ product: ProductRow; related: RelatedProduct[] }>(
@@ -119,13 +121,31 @@ export default function ProductDetailView({ slug }: { slug: string }) {
       setRelated(res.related || [])
       setActiveImage(0)
     } catch (err) {
-      setError((err as Error).message)
+      if (!initial) setError((err as Error).message)
     } finally {
       setLoading(false)
     }
   }, [slug])
 
   useEffect(() => { load() }, [load])
+
+  // Internal links — product → relevant blog articles
+  useEffect(() => {
+    const cat = (product?.category || '').trim()
+    const fetchPosts = async (q: string) => {
+      const params = new URLSearchParams({ limit: '3' })
+      if (q) params.set('q', q)
+      const res = await api<{ posts: Array<{ id: string; title: string; slug: string; excerpt: string | null; readingMinutes: number }> }>(`/api/posts?${params}`)
+      return res.posts
+    }
+    ;(async () => {
+      try {
+        let list = cat ? await fetchPosts(cat) : []
+        if (list.length < 2) list = await fetchPosts('')
+        setPosts(list.slice(0, 3))
+      } catch { /* optional block */ }
+    })()
+  }, [product?.category])
 
   const buy = async () => {
     if (!product) return
@@ -139,7 +159,7 @@ export default function ProductDetailView({ slug }: { slug: string }) {
   }
 
   const share = async () => {
-    const url = `${window.location.origin}/#/store/item/${slug}`
+    const url = `${window.location.origin}/store/${slug}`
     try {
       if (navigator.share) {
         await navigator.share({ title: product?.name || 'MN.KP store pick', url })
@@ -418,7 +438,7 @@ export default function ProductDetailView({ slug }: { slug: string }) {
             {related.map((p) => (
               <button
                 key={p.id}
-                onClick={() => navigate(`/store/item/${p.slug}`)}
+                onClick={() => navigate(`/store/${p.slug}`)}
                 className="group text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all"
                 aria-label={`View ${p.name}`}
               >
@@ -453,6 +473,43 @@ export default function ProductDetailView({ slug }: { slug: string }) {
           </div>
         </section>
       )}
+
+      {/* Internal links — product → blog + services */}
+      {posts.length > 0 && (
+        <section className="mt-14" aria-label="From the blog">
+          <SectionHeading
+            eyebrow="Reading material"
+            title="From the blog"
+            description="Articles that go deeper on this kind of tool."
+          />
+          <ul className="grid sm:grid-cols-3 gap-4 mt-6">
+            {posts.map((p) => (
+              <li key={p.id}>
+                <button
+                  onClick={() => navigate(`/blog/${p.slug}`)}
+                  className="w-full text-left rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors"
+                >
+                  <p className="font-semibold text-sm leading-snug line-clamp-2">{p.title}</p>
+                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{p.excerpt || ''}</p>
+                  <p className="text-[11px] text-primary mt-3 font-medium">{p.readingMinutes} min read →</p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="mt-12 rounded-2xl border border-primary/25 bg-primary/5 p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1">
+          <p className="font-semibold">Want this set up for you?</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            I build AI-powered websites, apps and media from Calicut, Kerala — end to end.
+          </p>
+        </div>
+        <Button onClick={() => navigate('/services')} className="shrink-0">
+          See my services
+        </Button>
+      </div>
 
       {/* Store ad below related */}
       <AdSlot placement="store" variant="banner" className="mt-12" />

@@ -39,6 +39,8 @@ interface SessionContextValue {
   user: SessionUser | null
   setUser: (u: SessionUser | null) => void
   refresh: () => Promise<void>
+  /** true once /api/auth/me has resolved (user may still be null) */
+  loaded: boolean
 }
 
 interface SettingsContextValue {
@@ -50,6 +52,7 @@ export const SessionContext = createContext<SessionContextValue>({
   user: null,
   setUser: () => {},
   refresh: async () => {},
+  loaded: false,
 })
 
 export const SettingsContext = createContext<SettingsContextValue>({

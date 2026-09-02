@@ -428,7 +428,7 @@ function ProductDialog({ product, onClose }: { product: ProductRow | null; onClo
             </div>
             {product && (
               <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-2 text-xs">
-                <p className="flex justify-between"><span className="text-muted-foreground">Shareable URL</span><code className="text-primary">/#/store/item/{product.slug}</code></p>
+                <p className="flex justify-between"><span className="text-muted-foreground">Shareable URL</span><code className="text-primary">/store/{product.slug}</code></p>
                 <p className="flex justify-between"><span className="text-muted-foreground">Affiliate clicks</span><span className="font-semibold">{product.clicks.toLocaleString('en-IN')}</span></p>
               </div>
             )}

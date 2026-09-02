@@ -1,114 +1,81 @@
 'use client'
 
 // ─────────────────────────────────────────────────────────────
-// Hash router — SPA navigation without page routes.
-// Routes look like: #/blog, #/blog/my-post, #/admin/posts
+// Path router — real-URL navigation for full SEO support.
+// Routes look like: /blog, /blog/my-post, /admin/posts
 //
-// Uses useSyncExternalStore so the SSR snapshot ('/') and the
-// client snapshot (real hash) can differ WITHOUT hydration
-// mismatch errors — React re-renders with the client value
-// immediately after hydration.
+// Same public API as the previous hash router (navigate /
+// useHashRouter / back) so every view keeps working, but URLs
+// are now real, indexable, server-rendered paths.
+//
+// Next.js App Router powers the actual navigation; a module-level
+// router bridge lets `navigate()` work from any context.
 // ─────────────────────────────────────────────────────────────
-import { useCallback, useEffect, useSyncExternalStore } from 'react'
+import { useCallback, useEffect } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 export interface RouteMatch {
   /** e.g. "/blog/my-post" (always starts with "/") */
   path: string
   /** path segments: ["blog", "my-post"] */
   segments: string[]
-  /** query string parsed from "#/blog?q=hello" */
+  /** query string parsed from "/blog?q=hello" */
   query: Record<string, string>
 }
 
-function parseHash(): RouteMatch {
-  const raw = window.location.hash.replace(/^#/, '') || '/'
-  const [pathPart, queryPart] = raw.split('?')
-  const path = pathPart.startsWith('/') ? pathPart : `/${pathPart}`
-  const query: Record<string, string> = {}
-  if (queryPart) {
-    for (const [k, v] of new URLSearchParams(queryPart)) query[k] = v
-  }
-  return {
-    path: path.replace(/\/+$/, '') || '/',
-    segments: path.split('/').filter(Boolean),
-    query,
-  }
-}
+// Bridge: latest router instance from any mounted component
+let routerRef: ReturnType<typeof useRouter> | null = null
 
 export function navigate(path: string, opts: { replace?: boolean } = {}) {
-  const target = `#${path.startsWith('/') ? path : `/${path}`}`
+  const target = path.startsWith('/') ? path : `/${path}`
+  if (typeof window === 'undefined') return
+
+  const current = window.location.pathname + window.location.search
+  const r = routerRef
+
+  if (!r) {
+    // Router not mounted yet — plain location navigation
+    if (opts.replace) window.location.replace(target)
+    else if (current !== target) window.location.assign(target)
+    return
+  }
+
   if (opts.replace) {
-    window.history.replaceState(null, '', target)
-    window.dispatchEvent(new HashChangeEvent('hashchange'))
-  } else if (window.location.hash !== target) {
-    window.location.hash = target
+    r.replace(target)
+  } else if (current !== target) {
+    r.push(target)
   } else {
     // same route — force scroll to top for consistency
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
-// ── Global store (single listener, cached snapshot) ──────────
-const SERVER_SNAPSHOT: RouteMatch = { path: '/', segments: [], query: {} }
-let cached: RouteMatch | null = null
-let listening = false
-const listeners = new Set<() => void>()
-
-function refreshSnapshot() {
-  cached = parseHash()
-  listeners.forEach((l) => l())
-}
-
-function ensureListener() {
-  if (listening || typeof window === 'undefined') return
-  listening = true
-  window.addEventListener('hashchange', () => {
-    refreshSnapshot()
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-  })
-}
-
-function subscribe(cb: () => void) {
-  ensureListener()
-  listeners.add(cb)
-  return () => {
-    listeners.delete(cb)
-  }
-}
-
-function getSnapshot(): RouteMatch {
-  if (!cached) cached = parseHash()
-  return cached
-}
-
-function getServerSnapshot(): RouteMatch {
-  return SERVER_SNAPSHOT
-}
-
 export function useHashRouter(): RouteMatch & {
   navigate: typeof navigate
   back: () => void
 } {
-  const route = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  const pathname = usePathname() || '/'
+  const sp = useSearchParams()
+  const router = useRouter()
+
+  // Bridge for module-level navigate() — set after mount (effects
+  // flush before any user interaction can call navigate).
+  useEffect(() => {
+    routerRef = router
+  }, [router])
+
+  const query: Record<string, string> = {}
+  sp.forEach((v, k) => {
+    query[k] = v
+  })
+
+  // Normalize: strip trailing slashes (except root)
+  let path = pathname
+  if (path !== '/' && path.endsWith('/')) path = path.replace(/\/+$/, '') || '/'
 
   const back = useCallback(() => {
-    if (window.history.length > 1) window.history.back()
-    else navigate('/')
-  }, [])
+    router.back()
+  }, [router])
 
-  return { ...route, navigate, back }
-}
-
-// Scroll restore + history support for hash router
-export function useScrollRestorationOnMount(routePath: string) {
-  useEffect(() => {
-    const key = `scroll:${routePath}`
-    const saved = sessionStorage.getItem(key)
-    if (saved) {
-      window.scrollTo({ top: parseInt(saved, 10) || 0, behavior: 'instant' as ScrollBehavior })
-    }
-    return () => {
-      sessionStorage.setItem(key, String(window.scrollY))
-    }
-  }, [routePath])
+  return { path, segments: path.split('/').filter(Boolean), query, navigate, back }
 }

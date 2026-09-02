@@ -26,6 +26,7 @@ export interface FooterLinkRow {
 }
 
 let footerCache: FooterLinkRow[] | null = null
+let venturesCache: Array<{ name: string; href: string | null }> = []
 export function invalidateFooterCache() {
   footerCache = null
 }
@@ -56,8 +57,20 @@ export function SiteFooter() {
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
   const [links, setLinks] = useState<FooterLinkRow[]>(footerCache || [])
+  const [liveVentures, setLiveVentures] = useState<Array<{ name: string; href: string | null }>>([])
   const { toast } = useToast()
   const { user } = useSession()
+
+  useEffect(() => {
+    if (venturesCache.length) { setLiveVentures(venturesCache); return }
+    api<{ ventures: Array<{ name: string; href: string | null; active: boolean }> }>('/api/ventures')
+      .then((d) => {
+        const list = (d.ventures || []).filter((v) => v.active).map(({ name, href }) => ({ name, href }))
+        venturesCache = list
+        setLiveVentures(list)
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (footerCache) return
@@ -79,7 +92,7 @@ export function SiteFooter() {
     try {
       const res = await api<{ message: string }>('/api/subscribers', {
         method: 'POST',
-        body: { email, page: window.location.hash.replace('#', '') || '/' },
+        body: { email, page: window.location.pathname || '/' },
       })
       setDone(true)
       toast({ title: 'Subscribed', description: res.message })
@@ -226,7 +239,7 @@ export function SiteFooter() {
         <nav aria-label="Footer ventures">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Ventures</p>
           <ul className="space-y-2.5 text-sm">
-            {(venturesLinks.length ? venturesLinks : VENTURES.map((v) => ({
+            {(venturesLinks.length ? venturesLinks : (liveVentures.length ? liveVentures : VENTURES.map((v) => ({ name: v.name, href: v.href }))).map((v) => ({
               id: v.name, section: 'ventures', label: v.name, url: v.href || '/ventures', active: true, sortOrder: 0,
             }))).map((l) => (
               <li key={l.id}><FooterNavLink link={l} /></li>

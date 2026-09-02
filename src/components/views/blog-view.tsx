@@ -1,7 +1,8 @@
 'use client'
 
-// Blog — searchable, tag-filtered, paginated article grid
-import { useCallback, useEffect, useState, Fragment } from 'react'
+// Blog — searchable, tag-filtered, paginated article grid.
+// Accepts server-rendered initial data so crawlers get real HTML.
+import { useCallback, useEffect, useRef, useState, Fragment } from 'react'
 import { Search, Newspaper, Tag, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -28,19 +29,28 @@ interface PostRow {
   publishedAt: string | null
 }
 
-export default function BlogView() {
+export interface PostsResponse {
+  posts: PostRow[]
+  total: number
+  pages: number
+  tags: string[]
+}
+
+export default function BlogView({ initial }: { initial?: PostsResponse | null }) {
   const [query, setQuery] = useState('')
   const [debouncedQ, setDebouncedQ] = useState('')
   const [tag, setTag] = useState('')
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<{ posts: PostRow[]; total: number; pages: number; tags: string[] } | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<PostsResponse | null>(initial || null)
+  const [loading, setLoading] = useState(!initial)
   const [error, setError] = useState('')
+  // Skip the first (default-filter) fetch when server data is already in place
+  const skipFirst = useRef(Boolean(initial))
 
   useSeo(
     {
-      title: 'Blog — AI, Building & Business',
-      description: 'Articles on AI-powered development, freelancing, creative media and business from Calicut, Kerala.',
+      title: 'Blog — AI Development, Freelancing & One-Person Business',
+      description: 'Practical articles on AI-powered development, freelancing rates, photography and running a one-person business — written from Calicut, Kerala by Mohammed Nihad KP.',
       path: '/blog',
     },
     ['blog']
@@ -52,13 +62,17 @@ export default function BlogView() {
   }, [query])
 
   const load = useCallback(async () => {
+    if (skipFirst.current) {
+      skipFirst.current = false
+      return
+    }
     setLoading(true)
     setError('')
     try {
       const params = new URLSearchParams({ page: String(page), limit: '9' })
       if (debouncedQ) params.set('q', debouncedQ)
       if (tag) params.set('tag', tag)
-      const res = await api<{ posts: PostRow[]; total: number; pages: number; tags: string[] }>(`/api/posts?${params}`)
+      const res = await api<PostsResponse>(`/api/posts?${params}`)
       setData(res)
     } catch (err) {
       setError((err as Error).message)

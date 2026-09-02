@@ -51,3 +51,31 @@ Stage Summary:
 - Admin credentials: admin@nihadkp.com / Nihad@2026
 - Realtime service auto-starts via .zscripts (bun --hot); mini-service in mini-services/realtime
 - For production: set DATABASE_URL to Neon/Supabase Postgres (schema is compatible), set AUTH_SECRET + INTERNAL_SECRET env vars, wire real SMTP for verification emails
+
+---
+Task ID: 3
+Agent: Main Agent (Super Z)
+Task: V3 — full SEO/AEO/GEO/MEO upgrade (real server routes + admin re-edit everything)
+
+Work Log:
+- CRITICAL FIX: migrated hash routes (#/blog — invisible to Google) to real server-rendered URLs; rewrote use-hash-router.ts onto next/navigation (same navigate/useHashRouter API so all 29 consuming files kept working); HashRedirect in root layout converts legacy #/ links to real paths (e.g. #/blog/x → /blog/x); /store/item/[slug] 308-redirects to /store/[slug]
+- Built AppShell (from old SiteRoot): session/settings contexts + loaded flag, realtime + RealtimeFeedProvider (feed/alerts via context for admin), analytics tracking by pathname, maintenance gate, chrome toggling for admin
+- Route tree (19 routes, all force-dynamic): /, /blog, /blog/[slug], /store, /store/[slug], /store/item/[slug] (redirect), /services, /about, /ventures, /contact, /search, /more, /help, /legal (redirect), /legal/[slug], 6 auth pages, onboarding/account/billing/support, /admin/[[...rest]] with AdminGate (401/403 client guard), not-found.tsx
+- SEO: src/lib/seo-metadata.ts single source of truth — keyword-first titles per page ("MN.KP — AI Developer & Freelancer in Calicut, Kerala", "Freelance Services in Calicut, Kerala…", "{product} Review, Price & Best Deal — ₹{price}"), unique meta description for EVERY page, canonical/OG/Twitter via buildMetadata generateMetadata; layout default title/description upgraded + RSS alternate
+- Blog posts & products now SSR full content (initial props) — critical because GPTBot/ClaudeBot don't execute JS; verified 1,520 words in initial HTML of a post
+- Dynamic sitemap.ts from DB (41 URLs: static + posts + products + legal, lastModified from DB) — GSC-ready; robots.ts allows all AI crawlers explicitly, disallows private areas; removed conflicting public/sitemap.xml + robots.txt
+- GEO: public/llms.txt (site manifest, NAP, socials) + /llms-full.txt route (all posts/products/services as clean markdown from live DB)
+- MEO: /feed.xml RSS 2.0 route (20 latest posts), per-page OG/Twitter cards, image alts
+- AEO: SERVICES_FAQ (6 Q&As) + HELP_FAQS rendered as FAQPage JSON-LD on /services + /help, visible FAQ accordions; ProfessionalService + geo (11.2588, 75.7804) + areaServed Calicut/Kozhikode/Kerala; Person/Organization/ContactPage/BreadcrumbList JSON-LD server-rendered on every route
+- City signals: services page heading "Freelance services in Calicut, delivered end-to-end" + "Based in Calicut, working worldwide" location block; DB service descriptions enriched with Calicut/Kozhikode (scripts/update-services-city.ts) + constants fallback updated
+- Internal links: blog posts → services + store CTA blocks; product detail → "From the blog" (category-matched posts) + services CTA; services → 3 latest posts; footer links live; share URLs now real paths
+- Admin re-edit EVERYTHING: new Venture Prisma model + /api/ventures CRUD (GET/POST/PUT/DELETE) + admin-ventures.tsx (create/edit/reorder/toggle/delete) + seeded 5 ventures + ventures-view + footer ventures column now DB-driven; media PATCH edit UI (name/type/alt) added to admin-media; posts/products/services/ads/marquee/footer/users/comments/settings already had edit — verified
+- Fixed: useCallback import (react not next/navigation), Date-vs-string PostRow casts, sitemap literal types, BackLink real href, ad-slot/cookie-consent/admin-products hash leftovers, inquiry page context = pathname, eslint ignores for scripts/, react-hooks purity (routerRef via effect)
+- E2E (agent-browser): all 19 routes + 41 sitemap URLs 200; per-post/product titles verified in <title>; SPA nav home→blog→services; legacy #/ and /store/item redirects work; admin login → ventures edit → live on public page; media edit persisted; inquiry submitted → stored with page=/services → cleaned; mobile 375px + desktop screenshots; 0 page errors, 0 console errors; tsc clean; lint clean
+- Committed as v3
+
+Stage Summary:
+- Site now has real indexable URLs with server-rendered SEO on every page — ready for Google Search Console (submit https://nihadkp.com/sitemap.xml)
+- All 4 engines covered: SEO (titles/meta/sitemap/robots/internal links), AEO (FAQPage + direct answers), GEO (llms.txt + full-content dump + AI crawler access), MEO (RSS + OG cards)
+- Admin can re-edit every entity: posts, products, services, ventures (new), media, ads, marquee, footer, settings, users
+- Admin credentials unchanged: admin@nihadkp.com / Nihad@2026

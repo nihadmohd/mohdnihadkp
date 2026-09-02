@@ -79,7 +79,7 @@ async function openAd(ad: AdRow) {
     const res = await api<{ url: string }>(`/api/ads/${ad.id}/click`, { method: 'POST' })
     window.open(res.url, '_blank', 'noopener')
   } catch {
-    window.open(ad.product?.slug ? `/#/store/item/${ad.product.slug}` : '/#/store', '_blank', 'noopener')
+    window.open(ad.product?.slug ? `/store/${ad.product.slug}` : '/store', '_blank', 'noopener')
   }
 }
 

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import { SITE } from "@/lib/constants";
+import { HashRedirect } from "@/components/site/hash-redirect";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,10 +24,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s | ${SITE.name}`,
+    default: "MN.KP — AI Developer & Freelancer in Calicut, Kerala | Mohammed Nihad KP",
+    template: "%s | MN.KP",
   },
-  description: SITE.description,
+  description:
+    "Hire Mohammed Nihad KP (MN.KP) — an AI-powered web & app developer, photographer and digital creator from Calicut, Kerala. Websites, apps, media and marketing, delivered end-to-end.",
   keywords: [
     "MN.KP",
     "Mohammed Nihad KP",
@@ -46,6 +48,10 @@ export const metadata: Metadata = {
   publisher: SITE.name,
   formatDetection: { email: false, address: false, telephone: false },
   manifest: "/manifest.webmanifest",
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": `${SITE.url}/feed.xml` },
+  },
   icons: {
     icon: [
       { url: "/favicon.png", type: "image/png", sizes: "48x48" },
@@ -53,10 +59,10 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  alternates: { canonical: "/" },
   openGraph: {
-    title: `${SITE.name} — ${SITE.tagline}`,
-    description: SITE.description,
+    title: "MN.KP — AI Developer & Freelancer in Calicut, Kerala",
+    description:
+      "Hire Mohammed Nihad KP (MN.KP) — AI-powered websites, apps, photography and digital solutions from Calicut, Kerala.",
     url: SITE.url,
     siteName: SITE.name,
     locale: "en_IN",
@@ -105,6 +111,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <HashRedirect />
           {children}
           <Toaster />
         </ThemeProvider>

@@ -1,9 +1,10 @@
 'use client'
 
 // Live users badge + provider (socket-driven realtime presence)
+// + realtime feed/alerts context (consumed by the admin shell).
 import { createContext, useContext, type ReactNode } from 'react'
 import { Activity } from 'lucide-react'
-import type { LiveStats } from '@/hooks/use-realtime'
+import type { LiveStats, ActivityEntry, AdminAlert } from '@/hooks/use-realtime'
 import { useSiteSettings } from '@/components/site/site-context'
 
 const LiveStatsContext = createContext<LiveStats | null>(null)
@@ -11,6 +12,24 @@ export const useLiveStats = () => useContext(LiveStatsContext)
 
 export function LiveUsersProvider({ stats, children }: { stats: LiveStats | null; children: ReactNode }) {
   return <LiveStatsContext.Provider value={stats}>{children}</LiveStatsContext.Provider>
+}
+
+interface RealtimeFeedValue {
+  feed: ActivityEntry[]
+  alerts: AdminAlert[]
+}
+
+const RealtimeFeedContext = createContext<RealtimeFeedValue>({ feed: [], alerts: [] })
+export const useRealtimeFeed = () => useContext(RealtimeFeedContext)
+
+export function RealtimeFeedProvider({
+  feed, alerts, children,
+}: { feed: ActivityEntry[]; alerts: AdminAlert[]; children: ReactNode }) {
+  return (
+    <RealtimeFeedContext.Provider value={{ feed, alerts }}>
+      {children}
+    </RealtimeFeedContext.Provider>
+  )
 }
 
 export function LiveBadge({ compact = false }: { compact?: boolean }) {

@@ -24,9 +24,10 @@ import { useSeo } from '@/hooks/use-seo'
 import { navigate } from '@/hooks/use-hash-router'
 import { api } from '@/lib/api-client'
 import { SERVICE_OFFERINGS, BUDGET_OPTIONS, SITE, WHAT_I_BRING } from '@/lib/constants'
+import { SERVICES_FAQ } from '@/lib/seo-metadata'
 import { useToast } from '@/hooks/use-toast'
 import type { LucideIcon } from 'lucide-react'
-import { Cpu, TrendingUp } from 'lucide-react'
+import { Cpu, TrendingUp, MapPin, HelpCircle } from 'lucide-react'
 
 const ICONS: Record<string, LucideIcon> = {
   camera: Camera, video: Video, code: Code2, brain: Brain, megaphone: Megaphone,
@@ -44,7 +45,21 @@ interface ServiceRow {
   featured: boolean
 }
 
-export default function ServicesView({ initial }: { initial: Array<Record<string, unknown>> }) {
+interface PostLite {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  readingMinutes: number
+}
+
+export default function ServicesView({
+  initial,
+  posts = [],
+}: {
+  initial: Array<Record<string, unknown>>
+  posts?: PostLite[]
+}) {
   const [services, setServices] = useState<ServiceRow[]>(() =>
     (initial.length
       ? initial
@@ -56,8 +71,8 @@ export default function ServicesView({ initial }: { initial: Array<Record<string
 
   useSeo(
     {
-      title: 'Services — Photography, Video, AI Development',
-      description: 'Photography, videography, AI-driven web/app development, marketing and creative media services by Mohammed Nihad KP.',
+      title: 'Freelance Services in Calicut, Kerala — AI Development, Photography & Video',
+      description: 'Freelance services in Calicut (Kozhikode), Kerala: AI-powered website & app development, photography, videography, digital marketing and AI consulting by Mohammed Nihad KP. From ₹1,499.',
       path: '/services',
     },
     ['services']
@@ -72,9 +87,9 @@ export default function ServicesView({ initial }: { initial: Array<Record<string
   return (
     <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 sm:py-14 pb-24 lg:pb-14">
       <SectionHeading
-        eyebrow="Services"
-        title="Everything, executed end-to-end"
-        description="One person accountable from idea to delivery — powered by AI where it helps, human craft where it matters."
+        eyebrow="Services · Calicut, Kerala"
+        title="Freelance services in Calicut, delivered end-to-end"
+        description="Based in Calicut (Kozhikode), Kerala — serving local businesses and clients worldwide. One person accountable from idea to delivery, powered by AI where it helps, human craft where it matters."
       />
 
       {error && <div className="mb-6"><InlineError message={error} /></div>}
@@ -168,6 +183,64 @@ export default function ServicesView({ initial }: { initial: Array<Record<string
         </ol>
       </section>
 
+      {/* Location signal — natural, not stuffed */}
+      <section className="mt-12 rounded-3xl border border-border bg-card p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-5" aria-label="Service area">
+        <span className="grid place-items-center size-14 rounded-2xl bg-primary/12 text-primary shrink-0">
+          <MapPin className="size-7" />
+        </span>
+        <div className="flex-1">
+          <h2 className="font-display font-bold text-lg">Based in Calicut, working worldwide</h2>
+          <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+            I serve businesses across <strong className="text-foreground font-medium">Calicut (Kozhikode) and greater Kerala</strong> in person —
+            shoots on location, face-to-face project briefings — and clients across India and abroad over WhatsApp, email and video calls.
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => navigate('/contact')} className="shrink-0">
+          Get in touch
+        </Button>
+      </section>
+
+      {/* AEO — FAQ with direct answers (FAQPage JSON-LD emitted server-side) */}
+      <section className="mt-16" aria-label="Frequently asked questions">
+        <SectionHeading eyebrow="FAQ" title="Questions, answered straight" />
+        <div className="grid md:grid-cols-2 gap-4 mt-6">
+          {SERVICES_FAQ.map((f) => (
+            <details key={f.q} className="group rounded-2xl border border-border bg-card p-5 [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex items-start gap-3 cursor-pointer list-none">
+                <HelpCircle className="size-4.5 text-primary shrink-0 mt-0.5" aria-hidden />
+                <span className="font-semibold text-sm leading-snug">{f.q}</span>
+              </summary>
+              <p className="text-sm text-muted-foreground mt-3 leading-relaxed pl-8">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      {/* Internal links — services → blog */}
+      {posts.length > 0 && (
+        <section className="mt-16" aria-label="Related reading">
+          <SectionHeading
+            eyebrow="From the blog"
+            title="Good reading before you hire"
+            description="How I work, what things cost, and the thinking behind the craft."
+          />
+          <ul className="grid sm:grid-cols-3 gap-4 mt-6">
+            {posts.map((p) => (
+              <li key={p.id}>
+                <button
+                  onClick={() => navigate(`/blog/${p.slug}`)}
+                  className="w-full text-left rounded-2xl border border-border bg-card p-5 h-full flex flex-col hover:border-primary/40 transition-colors"
+                >
+                  <p className="font-semibold text-sm leading-snug line-clamp-2">{p.title}</p>
+                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2 flex-1">{p.excerpt || ''}</p>
+                  <p className="text-[11px] text-primary mt-3 font-medium">{p.readingMinutes} min read →</p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {inquiryFor && <InquiryDialog service={inquiryFor} onClose={() => setInquiryFor(null)} />}
 
       {/* Affiliate ad (admin-managed, services placement) */}
@@ -203,7 +276,7 @@ export function InquiryDialog({
         body: {
           name, email, phone, subject, budget, message,
           serviceId: service?.id || null,
-          page: window.location.hash.replace(/^#/, '') || '/',
+          page: window.location.pathname || '/',
         },
       })
       setDone(true)

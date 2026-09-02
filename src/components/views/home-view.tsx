@@ -20,11 +20,20 @@ import { navigate } from '@/hooks/use-hash-router'
 import {
   SITE, WHAT_I_BRING, VISION_STATEMENTS, SKILLS, VENTURES, SERVICE_OFFERINGS,
 } from '@/lib/constants'
-import type { InitialData } from '@/components/site/site-root'
+
 import { useSeo } from '@/hooks/use-seo'
 import { personJsonLd, websiteJsonLd } from '@/lib/seo'
 import { SocialIcon } from '@/components/shared/social-icon'
 import { SOCIALS } from '@/lib/constants'
+
+// Initial server data shape (matches src/app/page.tsx)
+export interface InitialData {
+  settings: Record<string, string>
+  services: Array<Record<string, unknown>>
+  featuredPosts: Array<Record<string, unknown>>
+  latestPosts: Array<Record<string, unknown>>
+  featuredProducts: Array<Record<string, unknown>>
+}
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },

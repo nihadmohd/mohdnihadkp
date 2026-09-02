@@ -104,7 +104,7 @@ export function CookieConsent() {
               onChange={(v) => setPrefs((p) => ({ ...p, marketing: v }))}
             />
             <Link
-              href="#/legal/cookie-policy"
+              href="/legal/cookie-policy"
               onClick={() => setVisible(false)}
               className="inline-block text-xs text-primary hover:underline"
             >

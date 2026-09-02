@@ -62,8 +62,8 @@ export default function StoreView({ initial }: { initial: Array<Record<string, u
 
   useSeo(
     {
-      title: 'Store — Curated Tools & Gear',
-      description: 'Affiliate picks: the tools, hosting, gear and apps I actually use in my AI-powered workflow. Curated, not catalogued.',
+      title: 'Store — Best AI Tools, Software & Gear I Actually Use',
+      description: 'Honestly reviewed AI tools, software, hosting and creator gear — with prices for India, pros, cons and the best deals. Every pick is something I use in my own workflow.',
       path: '/store',
     },
     ['store']
@@ -184,7 +184,7 @@ export default function StoreView({ initial }: { initial: Array<Record<string, u
             {products.map((p) => (
               <button
                 key={p.id}
-                onClick={() => navigate(`/store/item/${p.slug}`)}
+                onClick={() => navigate(`/store/${p.slug}`)}
                 className="group text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col"
                 aria-label={`View ${p.name}`}
               >

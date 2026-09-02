@@ -179,6 +179,23 @@ model FooterLink {
   active    Boolean  @default(true)
 }
 
+// KP Foundation ventures — fully admin-editable (re-edit anything
+// that has been added and will be added, per the site owner).
+model Venture {
+  id          String   @id @default(cuid())
+  name        String
+  tagline     String?
+  description String   @default("")
+  href        String? // external link or internal path
+  icon        String   @default("foundation") // foundation | store | connect | gold | study | globe
+  accent      String   @default("emerald") // emerald | amber | teal | yellow | lime
+  badge       String? // e.g. "Flagship" | "Live" | "Free Service"
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // Every form a visitor fills lands here so the admin sees all
 // submissions with full contact details in one place.
 model FormSubmission {

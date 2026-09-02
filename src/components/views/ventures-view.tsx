@@ -1,26 +1,52 @@
 'use client'
 
-// Ventures — KP Foundation ecosystem
+// Ventures — KP Foundation ecosystem (DB-driven, admin-editable;
+// falls back to the built-in list if the API is unavailable).
+import { useEffect, useState } from 'react'
 import { ArrowUpRight, Network, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SectionHeading } from '@/components/shared/section-heading'
 import { useSeo } from '@/hooks/use-seo'
 import { navigate } from '@/hooks/use-hash-router'
+import { api } from '@/lib/api-client'
 import { VENTURES } from '@/lib/constants'
 
-export default function VenturesView() {
+interface VentureRow {
+  id: string
+  name: string
+  tagline: string | null
+  description: string
+  href: string | null
+  badge: string | null
+}
+
+export default function VenturesView({ initial }: { initial?: Array<Record<string, unknown>> }) {
+  const [ventures, setVentures] = useState<VentureRow[]>(() =>
+    initial?.length
+      ? (initial as unknown as VentureRow[])
+      : (VENTURES.map(({ name, tagline, description, href, badge }) => ({
+          id: name, name, tagline, description, href, badge,
+        })) as VentureRow[])
+  )
+
+  useEffect(() => {
+    api<{ ventures: VentureRow[] }>('/api/ventures')
+      .then((d) => d.ventures?.length && setVentures(d.ventures))
+      .catch(() => {})
+  }, [])
+
   useSeo(
     {
-      title: 'Ventures — KP Foundation Ecosystem',
-      description: 'KP Foundation, Calicut Store, Chaliyam Connect, Calicut Gold and PolyStudy — one foundation, many ventures.',
+      title: 'KP Foundation Ventures — Calicut Store, Chaliyam, Calicut Gold & PolyStudy',
+      description: 'Explore the KP Foundation ecosystem built from Calicut, Kerala: Calicut Store, Chaliyam Connect, Calicut Gold and PolyStudy — one foundation, many ventures.',
       path: '/ventures',
     },
     ['ventures']
   )
 
-  const flagship = VENTURES[0]
-  const others = VENTURES.slice(1)
+  const flagship = ventures[0]
+  const others = ventures.slice(1)
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 sm:py-14 pb-24 lg:pb-14">
@@ -43,9 +69,9 @@ export default function VenturesView() {
               <Sparkles className="size-3" aria-hidden /> Flagship
             </Badge>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mt-5">{flagship.name}</h2>
-          <p className="text-primary font-medium mt-1">{flagship.tagline}</p>
-          <p className="text-muted-foreground mt-4 leading-relaxed max-w-2xl">{flagship.description}</p>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold mt-5">{flagship?.name || 'KP Foundation'}</h2>
+          <p className="text-primary font-medium mt-1">{flagship?.tagline || ''}</p>
+          <p className="text-muted-foreground mt-4 leading-relaxed max-w-2xl">{flagship?.description}</p>
           <p className="text-sm text-muted-foreground mt-4 italic">
             Malayalam note: <span className="not-italic">ithinte under ellaatharam business um undaavum —</span> this is the base; every kind of business will live under it.
           </p>
@@ -70,10 +96,10 @@ export default function VenturesView() {
               <span className="grid place-items-center size-12 rounded-2xl bg-primary/12 text-primary font-display font-bold">
                 {v.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
               </span>
-              <Badge variant="secondary">{v.badge}</Badge>
+              <Badge variant="secondary">{v.badge || 'Venture'}</Badge>
             </div>
             <h3 className="font-display font-bold text-xl mt-4">{v.name}</h3>
-            <p className="text-primary text-sm font-medium mt-0.5">{v.tagline}</p>
+            <p className="text-primary text-sm font-medium mt-0.5">{v.tagline || ''}</p>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed flex-1">{v.description}</p>
             {v.href && (
               <a

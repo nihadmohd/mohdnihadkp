@@ -94,7 +94,7 @@ export const SERVICE_OFFERINGS = [
     slug: 'photography',
     icon: 'camera',
     description:
-      'End-to-end photography — from concept to color-graded final delivery. Events, products, portraits and brand shoots, edited professionally in Lightroom.',
+      'End-to-end photography in Calicut (Kozhikode), Kerala — from concept to color-graded final delivery. Events, products, portraits and brand shoots, edited professionally in Lightroom. On-location shoots across Kerala; destination work on request.',
     features: ['Event & product shoots', 'Professional color grading', 'Retouching & enhancement', 'Fast delivery'],
     priceFrom: '₹1,499',
   },
@@ -103,7 +103,7 @@ export const SERVICE_OFFERINGS = [
     slug: 'videography',
     icon: 'video',
     description:
-      'Cinematic videography and precision editing with CapCut and Adobe tools — reels, promos, event films and brand stories that hold attention.',
+      'Cinematic videography and precision editing with CapCut and Adobe tools — reels, promos, event films and brand stories that hold attention. Based in Calicut, Kerala; shooting across the state and editing for clients worldwide.',
     features: ['Cinematic event films', 'Reels & short-form content', 'Motion graphics & titles', 'Sound design included'],
     priceFrom: '₹2,999',
   },
@@ -112,7 +112,7 @@ export const SERVICE_OFFERINGS = [
     slug: 'ai-development',
     icon: 'code',
     description:
-      'I build apps, websites and digital solutions by mastering AI tools instead of hand-writing every line — meaning faster delivery, lower cost, and modern quality.',
+      'I build apps, websites and digital solutions by mastering AI tools instead of hand-writing every line — meaning faster delivery, lower cost, and modern quality. Website development in Calicut, Kerala for local businesses, plus remote projects across India and abroad.',
     features: ['Portfolio & business sites', 'Web apps & dashboards', 'AI-assisted rapid delivery', 'SEO-ready builds'],
     priceFrom: '₹4,999',
   },
@@ -121,7 +121,7 @@ export const SERVICE_OFFERINGS = [
     slug: 'ai-mastery',
     icon: 'brain',
     description:
-      'Learn to leverage artificial intelligence the way I do — practical sessions on using AI tools for development, content, automation and business.',
+      'Learn to leverage artificial intelligence the way I do — practical sessions on using AI tools for development, content, automation and business. One-on-one training in Calicut or online anywhere.',
     features: ['1-on-1 AI tool training', 'Workflow automation setup', 'Prompt engineering', 'Team workshops'],
     priceFrom: '₹999',
   },
@@ -130,7 +130,7 @@ export const SERVICE_OFFERINGS = [
     slug: 'marketing',
     icon: 'megaphone',
     description:
-      'Full-stack digital presence — social strategy, content calendars, campaign creatives and business planning grounded in market analysis.',
+      'Full-stack digital presence — social strategy, content calendars, campaign creatives and business planning grounded in market analysis. Digital marketing services for Calicut businesses and brands across Kerala, delivered remotely worldwide.',
     features: ['Social media strategy', 'Content calendars', 'Campaign creatives', 'Market analysis & planning'],
     priceFrom: '₹2,499',
   },
@@ -139,7 +139,7 @@ export const SERVICE_OFFERINGS = [
     slug: 'creative-media',
     icon: 'palette',
     description:
-      'Complete creative production — combining Canva, PicsArt, PixelLab and Adobe into one seamless visual pipeline for your brand.',
+      'Complete creative production — combining Canva, PicsArt, PixelLab and Adobe into one seamless visual pipeline for your brand. Creative media services from Calicut, Kerala with fast digital delivery anywhere.',
     features: ['Brand visual kits', 'Social creatives', 'Print & digital design', 'Consistent visual language'],
     priceFrom: '₹1,999',
   },
@@ -222,6 +222,7 @@ export const ADMIN_ROUTES = [
   { label: 'Marquee', path: '/admin/marquee', icon: 'images' },
   { label: 'Media', path: '/admin/media', icon: 'sticker' },
   { label: 'Services', path: '/admin/services', icon: 'briefcase' },
+  { label: 'Ventures', path: '/admin/ventures', icon: 'network' },
   { label: 'Inquiries', path: '/admin/inquiries', icon: 'inbox' },
   { label: 'Submissions', path: '/admin/submissions', icon: 'clipboard-list' },
   { label: 'Comments', path: '/admin/comments', icon: 'message-square' },

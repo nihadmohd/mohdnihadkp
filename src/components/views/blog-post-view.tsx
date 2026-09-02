@@ -21,7 +21,7 @@ import { SITE, SOCIALS } from '@/lib/constants'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 
-interface PostRow {
+export interface PostRow {
   id: string
   title: string
   slug: string
@@ -57,10 +57,10 @@ interface RelatedRow {
   publishedAt: string | null
 }
 
-export default function BlogPostView({ slug }: { slug: string }) {
-  const [post, setPost] = useState<PostRow | null>(null)
+export default function BlogPostView({ slug, initial }: { slug: string; initial?: PostRow | null }) {
+  const [post, setPost] = useState<PostRow | null>(initial || null)
   const [related, setRelated] = useState<RelatedRow[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initial)
   const [error, setError] = useState('')
   const { user } = useSession()
   const { toast } = useToast()
@@ -70,6 +70,17 @@ export default function BlogPostView({ slug }: { slug: string }) {
   const [copied, setCopied] = useState(false)
 
   const load = useCallback(async () => {
+    // Server-rendered post already in place — only top up related posts
+    if (initial) {
+      try {
+        const tag = post?.tags.split(',')[0]?.trim() || ''
+        const rel = await api<{ posts: RelatedRow[] }>(
+          `/api/posts?limit=3${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`
+        )
+        setRelated(rel.posts.filter((p) => p.slug !== slug).slice(0, 3))
+      } catch { /* related posts are optional */ }
+      return
+    }
     setLoading(true)
     setError('')
     try {
@@ -125,26 +136,13 @@ export default function BlogPostView({ slug }: { slug: string }) {
           publishedTime: post.publishedAt || undefined,
           tags: post.tags.split(',').filter(Boolean),
           author: post.author?.name || SITE.name,
-          jsonLd: {
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: post.title,
-            description: post.excerpt || '',
-            image: post.coverImage || `${SITE.url}/og-image.png`,
-            datePublished: post.publishedAt,
-            dateModified: post.publishedAt,
-            author: { '@type': 'Person', name: post.author?.name || SITE.name, url: SITE.url },
-            publisher: { '@type': 'Person', name: SITE.name },
-            mainEntityOfPage: `${SITE.url}/#/blog/${post.slug}`,
-            wordCount: post.content.split(/\s+/).length,
-          },
         }
       : { title: 'Article', description: SITE.description, path: `/blog/${slug}` },
     [post?.id, post?.title]
   )
 
   const share = async () => {
-    const url = `${window.location.origin}/#/blog/${slug}`
+    const url = `${window.location.origin}/blog/${slug}`
     const shareData = { title: post?.title || SITE.name, text: post?.excerpt || '', url }
     if (navigator.share) {
       try {
@@ -286,6 +284,34 @@ export default function BlogPostView({ slug }: { slug: string }) {
 
       {/* Inline affiliate ad (admin-managed, blog-inline placement) */}
       <AdSlot placement="blog-inline" variant="inline" className="mt-2" />
+
+      {/* Internal links — blog → services & store */}
+      <aside className="mt-10 grid sm:grid-cols-2 gap-4" aria-label="Explore related pages">
+        <div className="rounded-2xl border border-primary/25 bg-primary/5 p-5 flex flex-col gap-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">Work with me</p>
+          <p className="text-sm font-medium leading-snug">
+            Need a website, app or media built like this? I do it end-to-end from Calicut, Kerala.
+          </p>
+          <button
+            onClick={() => navigate('/services')}
+            className="text-sm font-semibold text-primary hover:underline text-left"
+          >
+            See my freelance services →
+          </button>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5 flex flex-col gap-2.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">My toolkit</p>
+          <p className="text-sm font-medium leading-snug">
+            The AI tools, software and gear behind these articles — honestly reviewed.
+          </p>
+          <button
+            onClick={() => navigate('/store')}
+            className="text-sm font-semibold text-foreground hover:text-primary transition-colors text-left"
+          >
+            Browse the curated store →
+          </button>
+        </div>
+      </aside>
 
       {/* Author box */}
       <div className="mt-12 rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">

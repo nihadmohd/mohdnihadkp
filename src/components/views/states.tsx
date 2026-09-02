@@ -239,7 +239,7 @@ function AlertTriangleIcon() {
 export { StateShell }
 export const BackLink = ({ to, label }: { to: string; label: string }) => (
   <Link
-    href={`#${to}`}
+    href={to}
     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
   >
     <ArrowLeft className="size-4" /> {label}
