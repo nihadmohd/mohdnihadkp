@@ -11,7 +11,7 @@ const DEFAULTS: Record<string, string> = {
   maintenanceMode: 'false',
   maintenanceMessage:
     'I am upgrading the platform right now. Everything will be back shortly — usually within a few minutes.',
-  contactEmail: 'hello@nihadkp.com',
+  contactEmail: 'hello@mohdnihadkp.vercel.app',
   whatsappNumber: '919846750898',
   showLiveCounter: 'true',
   blogEnabled: 'true',

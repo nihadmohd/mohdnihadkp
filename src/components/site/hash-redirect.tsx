@@ -1,7 +1,7 @@
 'use client'
 
 // Legacy hash-URL redirect — V1/V2 links look like:
-//   https://nihadkp.com/#/blog/my-post
+//   https://mohdnihadkp.vercel.app/#/blog/my-post
 // Search engines and AI crawlers treat "#..." as the same page,
 // so all public URLs are now real paths (/blog/my-post). This
 // component converts any legacy hash URL to its real path on

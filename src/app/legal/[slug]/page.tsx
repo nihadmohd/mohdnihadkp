@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   return buildMetadata('legal', `/legal/${doc.slug}`, {
     title: `${doc.title} | MN.KP`,
-    description: `${doc.title} for MN.KP (nihadkp.com) — the platform of Mohammed Nihad KP, Calicut, Kerala. Read the full policy.`,
+    description: `${doc.title} for MN.KP (mohdnihadkp.vercel.app) — the platform of Mohammed Nihad KP, Calicut, Kerala. Read the full policy.`,
   })
 }
 

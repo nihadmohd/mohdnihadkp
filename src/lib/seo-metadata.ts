@@ -55,7 +55,7 @@ export const SERVICES_FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'How do I start a project with you?',
-    a: 'Use the inquiry form on this page, message me on WhatsApp at +91 98467 50898, or email hello@nihadkp.com. Tell me your idea, budget and timeline — you get a personal reply with a fixed quote within 24 hours.',
+    a: 'Use the inquiry form on this page, message me on WhatsApp at +91 98467 50898, or email hello@mohdnihadkp.vercel.app. Tell me your idea, budget and timeline — you get a personal reply with a fixed quote within 24 hours.',
   },
 ]
 

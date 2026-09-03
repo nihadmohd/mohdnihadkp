@@ -13,7 +13,7 @@ export const SITE = {
   url: 'https://mohdnihadkp.vercel.app',
   locale: 'en_IN',
   location: 'Calicut, Kerala, India',
-  email: 'hello@nihadkp.com',
+  email: 'hello@mohdnihadkp.vercel.app',
   whatsappNumber: '919846750898',
   brand: 'KP Foundation',
   logo: '/logo.svg',

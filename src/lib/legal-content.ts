@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // Legal documents — full policy content for the platform
-// Owner: Mohammed Nihad KP (nihadkp.com), Calicut, Kerala, India
+// Owner: Mohammed Nihad KP (mohdnihadkp.vercel.app), Calicut, Kerala, India
 // ─────────────────────────────────────────────────────────────
 import { SITE } from '@/lib/constants'
 
@@ -25,7 +25,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'privacy-policy',
     title: 'Privacy Policy',
-    description: 'How nihadkp.com collects, uses, stores and protects your personal data under India\u2019s DPDP Act and international standards.',
+    description: 'How mohdnihadkp.vercel.app collects, uses, stores and protects your personal data under India\u2019s DPDP Act and international standards.',
     updated: UPDATED,
     sections: [
       { heading: 'Overview', body: intro('This Privacy Policy explains what personal data the Site collects, why it is collected, how long it is kept, and the rights you have over it.') },
@@ -74,7 +74,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'terms-of-service',
     title: 'Terms of Service',
-    description: 'The rules and agreements that govern your use of nihadkp.com — accounts, content, services, purchases and liability.',
+    description: 'The rules and agreements that govern your use of mohdnihadkp.vercel.app — accounts, content, services, purchases and liability.',
     updated: UPDATED,
     sections: [
       { heading: 'Acceptance', body: [...intro('These Terms form a binding agreement between you and the Site owner.'), 'If you do not agree with any part, please stop using the Site.'] },
@@ -122,7 +122,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'cookie-policy',
     title: 'Cookie Policy',
-    description: 'Every cookie nihadkp.com uses — what it stores, how long it lasts, and how to control it.',
+    description: 'Every cookie mohdnihadkp.vercel.app uses — what it stores, how long it lasts, and how to control it.',
     updated: UPDATED,
     sections: [
       { heading: 'What Cookies Are', body: intro('This policy lists every cookie the Site sets. Cookies are small text files stored by your browser.') },
@@ -149,7 +149,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'cookie-preferences',
     title: 'Cookie Preferences',
-    description: 'Choose which optional cookie categories nihadkp.com may use. Necessary cookies are always active.',
+    description: 'Choose which optional cookie categories mohdnihadkp.vercel.app may use. Necessary cookies are always active.',
     updated: UPDATED,
     sections: [
       { heading: 'Live Preference Panel', body: intro('This page hosts the interactive cookie consent manager. Use the controls on this page to save your choices instantly — they apply across the whole Site.') },
@@ -171,7 +171,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'refund-policy',
     title: 'Refund Policy',
-    description: 'When and how refunds are issued for services and digital products purchased through nihadkp.com.',
+    description: 'When and how refunds are issued for services and digital products purchased through mohdnihadkp.vercel.app.',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('This policy covers refunds for services booked and any future digital products or memberships sold on the Site.') },
@@ -201,7 +201,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'cancellation-policy',
     title: 'Cancellation Policy',
-    description: 'How to cancel service bookings, subscriptions and accounts on nihadkp.com.',
+    description: 'How to cancel service bookings, subscriptions and accounts on mohdnihadkp.vercel.app.',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('This policy explains cancellations for bookings, subscriptions and accounts.') },
@@ -229,7 +229,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'shipping-policy',
     title: 'Shipping Policy',
-    description: 'Physical product shipping terms for items ordered through nihadkp.com or its Calicut Store venture.',
+    description: 'Physical product shipping terms for items ordered through mohdnihadkp.vercel.app or its Calicut Store venture.',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('The Store currently lists affiliate products fulfilled by third-party merchants, and selected physical products shipped by me within India.') },
@@ -258,7 +258,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'return-exchange-policy',
     title: 'Return / Exchange Policy',
-    description: 'Eligibility, windows and process for returning or exchanging products bought from nihadkp.com.',
+    description: 'Eligibility, windows and process for returning or exchanging products bought from mohdnihadkp.vercel.app.',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('This covers returns and exchanges for physical products I ship directly.') },
@@ -287,7 +287,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'disclaimer',
     title: 'Disclaimer',
-    description: 'Accuracy of information, external links, affiliate relationships and professional advice limits on nihadkp.com.',
+    description: 'Accuracy of information, external links, affiliate relationships and professional advice limits on mohdnihadkp.vercel.app.',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('This disclaimer limits my responsibility for how information on the Site is used.') },
@@ -318,7 +318,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'accessibility-statement',
     title: 'Accessibility Statement',
-    description: 'My commitment and conformance level for making nihadkp.com usable by everyone, including assistive technology users.',
+    description: 'My commitment and conformance level for making mohdnihadkp.vercel.app usable by everyone, including assistive technology users.',
     updated: UPDATED,
     sections: [
       { heading: 'Commitment', body: intro('Accessibility is a design requirement here, not an afterthought — the Site targets WCAG 2.1 Level AA.') },
@@ -346,7 +346,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'data-processing-agreement',
     title: 'Data Processing Agreement',
-    description: 'Terms under which nihadkp.com processes personal data on behalf of business clients (controller–processor terms).',
+    description: 'Terms under which mohdnihadkp.vercel.app processes personal data on behalf of business clients (controller–processor terms).',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('This DPA applies when I process personal data of your customers/end-users as part of a service engagement (e.g. building your website, app or automation).') },
@@ -379,7 +379,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'acceptable-use-policy',
     title: 'Acceptable Use Policy',
-    description: 'What is — and is not — allowed when using nihadkp.com accounts, comments, forms and services.',
+    description: 'What is — and is not — allowed when using mohdnihadkp.vercel.app accounts, comments, forms and services.',
     updated: UPDATED,
     sections: [
       { heading: 'Scope', body: intro('This AUP defines prohibited conduct. It is incorporated into the Terms of Service.') },
@@ -406,7 +406,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'security-policy',
     title: 'Security Policy',
-    description: 'How nihadkp.com protects accounts, data and infrastructure — controls, monitoring and incident handling.',
+    description: 'How mohdnihadkp.vercel.app protects accounts, data and infrastructure — controls, monitoring and incident handling.',
     updated: UPDATED,
     sections: [
       { heading: 'Commitment', body: intro('This document summarises the security posture of the Site in plain language.') },
@@ -439,7 +439,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'responsible-disclosure',
     title: 'Responsible Disclosure',
-    description: 'How security researchers can report vulnerabilities in nihadkp.com safely and what I commit to in return.',
+    description: 'How security researchers can report vulnerabilities in mohdnihadkp.vercel.app safely and what I commit to in return.',
     updated: UPDATED,
     sections: [
       { heading: 'Program', body: intro('I welcome responsible security research on this Site and promise not to pursue legal action against good-faith reporters who follow this policy.') },
@@ -466,7 +466,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
   {
     slug: 'community-guidelines',
     title: 'Community Guidelines',
-    description: 'How to be a great member of the nihadkp.com community — in comments, support and social channels.',
+    description: 'How to be a great member of the mohdnihadkp.vercel.app community — in comments, support and social channels.',
     updated: UPDATED,
     sections: [
       { heading: 'The Spirit', body: intro('This is a builder\u2019s corner of the internet: curious, practical, generous. These guidelines keep it that way.') },

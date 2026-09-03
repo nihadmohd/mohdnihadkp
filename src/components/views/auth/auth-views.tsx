@@ -275,7 +275,7 @@ function AdminLoginView() {
           <Input
             id="admin-email" type="email" required autoComplete="email"
             value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@nihadkp.com"
+            placeholder="admin@mohdnihadkp.vercel.app"
           />
         </div>
         <div className="space-y-1.5">
