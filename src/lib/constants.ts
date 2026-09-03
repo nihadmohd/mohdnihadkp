@@ -10,7 +10,7 @@ export const SITE = {
   tagline: 'AI-Powered Developer & Digital Creator',
   description:
     'MN.KP — the platform of Mohammed Nihad KP. I build apps, websites, and digital solutions by mastering the AI tools of tomorrow. Freelancer, businessman and developer from Calicut, Kerala.',
-  url: 'https://nihadkp.com',
+  url: 'https://mohdnihadkp.vercel.app',
   locale: 'en_IN',
   location: 'Calicut, Kerala, India',
   email: 'hello@nihadkp.com',
