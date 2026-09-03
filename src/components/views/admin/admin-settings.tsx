@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   Settings, Save, Loader2, Megaphone, Wrench, Radio, FileText, Search,
-  ShieldCheck, Database, History,
+  ShieldCheck, Database, History, Paintbrush,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,7 @@ interface FullSettings {
   seoTitle: string
   seoDescription: string
   footerNote: string
+  defaultTheme: string
 }
 
 interface ActivityRow {
@@ -135,6 +136,31 @@ export default function AdminSettings() {
             <Label htmlFor="st-announce">Message (empty = hidden)</Label>
             <Input id="st-announce" value={form.announcement} onChange={(e) => set('announcement', e.target.value)} placeholder="e.g. New article: How I ship apps in days, not months" />
             <p className="text-[11px] text-muted-foreground">Shows as a highlighted strip on top of every page.</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Appearance */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Paintbrush className="size-4 text-primary" /> Appearance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="st-theme">Default Theme</Label>
+            <select
+              id="st-theme"
+              value={form.defaultTheme || 'dark'}
+              onChange={(e) => set('defaultTheme', e.target.value)}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="dark">Dark (Default)</option>
+              <option value="light">Light</option>
+              <option value="system">System (Auto)</option>
+            </select>
+            <p className="text-[11px] text-muted-foreground">The default color theme for new visitors.</p>
           </div>
         </CardContent>
       </Card>

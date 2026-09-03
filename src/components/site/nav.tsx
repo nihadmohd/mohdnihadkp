@@ -55,8 +55,8 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
         {/* ── Mobile header (compact) ── */}
         <div className="lg:hidden">
           <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
-            <button
-              onClick={() => navigate('/')}
+            <Link
+              href="/"
               className="flex items-center gap-2.5 min-w-0"
               aria-label={`${SITE.name} — home`}
             >
@@ -66,7 +66,7 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
               <span className="font-display font-semibold text-[15px] tracking-tight truncate">
                 Nihad<span className="text-primary">KP</span>
               </span>
-            </button>
+            </Link>
 
             <div className="flex items-center gap-1">
               <LiveBadge compact />
@@ -109,10 +109,8 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                         label={link.label}
                         icon={link.icon}
                         active={isActive(link.path)}
-                        onClick={() => {
-                          setMobileMenu(false)
-                          navigate(link.path)
-                        }}
+                        path={link.path}
+                        onClick={() => setMobileMenu(false)}
                       />
                     ))}
                     {isAdmin(user) && (
@@ -120,27 +118,25 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                         label="Admin Dashboard"
                         icon="layout-dashboard"
                         accent
-                        onClick={() => {
-                          setMobileMenu(false)
-                          navigate('/admin')
-                        }}
+                        path="/admin"
+                        onClick={() => setMobileMenu(false)}
                       />
                     )}
                   </nav>
                   <div className="p-4 border-t border-border/60 space-y-2">
                     {user ? (
                       <>
-                        <Button className="w-full" onClick={() => { setMobileMenu(false); navigate('/account') }}>
-                          <UserRound className="size-4" /> My Account
+                        <Button className="w-full" asChild onClick={() => setMobileMenu(false)}>
+                          <Link href="/account"><UserRound className="size-4 mr-2" /> My Account</Link>
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Button className="w-full" onClick={() => { setMobileMenu(false); navigate('/login') }}>
-                          <LogIn className="size-4" /> Sign In
+                        <Button className="w-full" asChild onClick={() => setMobileMenu(false)}>
+                          <Link href="/login"><LogIn className="size-4 mr-2" /> Sign In</Link>
                         </Button>
-                        <Button variant="outline" className="w-full" onClick={() => { setMobileMenu(false); navigate('/register') }}>
-                          Create Account
+                        <Button variant="outline" className="w-full" asChild onClick={() => setMobileMenu(false)}>
+                          <Link href="/register">Create Account</Link>
                         </Button>
                       </>
                     )}
@@ -162,8 +158,8 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
         {/* ── Desktop navbar ── */}
         <div className="hidden lg:block">
           <div className="mx-auto max-w-6xl px-6 h-16 flex items-center gap-6">
-            <button
-              onClick={() => navigate('/')}
+            <Link
+              href="/"
               className="flex items-center gap-3 shrink-0 group"
               aria-label={`${SITE.name} — home`}
             >
@@ -173,13 +169,13 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
               <span className="font-display font-semibold text-lg tracking-tight">
                 Nihad<span className="text-primary">KP</span>
               </span>
-            </button>
+            </Link>
 
             <nav className="flex items-center gap-1" aria-label="Primary">
               {NAV_LINKS.map((link) => (
-                <button
+                <Link
                   key={link.path}
-                  onClick={() => navigate(link.path)}
+                  href={link.path}
                   className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(link.path)
                       ? 'text-primary'
@@ -195,10 +191,10 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                       transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                     />
                   )}
-                </button>
+                </Link>
               ))}
-              <button
-                onClick={() => navigate('/ventures')}
+              <Link
+                href="/ventures"
                 className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive('/ventures')
                     ? 'text-primary'
@@ -206,7 +202,7 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                 }`}
               >
                 Ventures
-              </button>
+              </Link>
             </nav>
 
             <div className="flex-1" />
@@ -234,8 +230,8 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                 </Button>
               )}
               {user ? (
-                <button
-                  onClick={() => navigate('/account')}
+                <Link
+                  href="/account"
                   className="flex items-center gap-2 h-9 pl-1.5 pr-3 rounded-xl border border-border bg-card/60 hover:border-primary/40 transition-colors"
                   aria-label="Account menu"
                 >
@@ -248,14 +244,14 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                     </span>
                   )}
                   <span className="text-sm font-medium max-w-24 truncate">{user.name || 'Account'}</span>
-                </button>
+                </Link>
               ) : (
                 <>
-                  <Button size="sm" variant="ghost" onClick={() => navigate('/login')}>
-                    Sign In
+                  <Button size="sm" variant="ghost" asChild>
+                    <Link href="/login">Sign In</Link>
                   </Button>
-                  <Button size="sm" className="glow-sm" onClick={() => navigate('/contact')}>
-                    <Radio className="size-4" /> Hire Me
+                  <Button size="sm" className="glow-sm" asChild>
+                    <Link href="/contact"><Radio className="size-4 mr-2" /> Hire Me</Link>
                   </Button>
                 </>
               )}
@@ -268,25 +264,37 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
 }
 
 function MobileMenuItem({
-  label, icon, active, accent, onClick,
+  label, icon, active, accent, onClick, path,
 }: {
   label: string
   icon: string
   active?: boolean
   accent?: boolean
   onClick: () => void
+  path?: string
 }) {
   const Icon = iconMap[icon] || Sparkles
+  const className = `w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[15px] font-medium transition-colors ${
+    accent
+      ? 'text-primary bg-primary/10'
+      : active
+      ? 'text-primary bg-primary/10'
+      : 'text-foreground/80 hover:bg-muted'
+  }`
+
+  if (path) {
+    return (
+      <Link href={path} onClick={onClick} className={className} aria-current={active ? 'page' : undefined}>
+        <Icon className="size-[18px]" aria-hidden />
+        {label}
+      </Link>
+    )
+  }
+
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-[15px] font-medium transition-colors ${
-        accent
-          ? 'text-primary bg-primary/10'
-          : active
-          ? 'text-primary bg-primary/10'
-          : 'text-foreground/80 hover:bg-muted'
-      }`}
+      className={className}
       aria-current={active ? 'page' : undefined}
     >
       <Icon className="size-[18px]" aria-hidden />

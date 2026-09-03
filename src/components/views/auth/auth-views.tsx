@@ -318,7 +318,11 @@ function RegisterView() {
       })
       setCreated({ verifyToken: res.verifyToken })
     } catch (err) {
-      setError((err as Error).message)
+      const msg = (err as Error).message
+      setError(msg)
+      if (msg.toLowerCase().includes('already exists')) {
+        setTimeout(() => navigate('/login'), 2000)
+      }
     } finally {
       setLoading(false)
     }

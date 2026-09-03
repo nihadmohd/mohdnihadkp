@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import { SITE } from "@/lib/constants";
 import { HashRedirect } from "@/components/site/hash-redirect";
+import { getSettings } from "@/lib/page-data";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,11 +95,14 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSettings();
+  const defaultTheme = settings.defaultTheme || "dark";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -110,7 +114,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme={defaultTheme} enableSystem disableTransitionOnChange>
           <HashRedirect />
           {children}
           <Toaster />

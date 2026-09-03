@@ -4,7 +4,7 @@
 import { motion } from 'framer-motion'
 import { Home, Newspaper, ShoppingBag, Briefcase, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { MOBILE_TABS } from '@/lib/constants'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 
 const TAB_ICONS: Record<string, LucideIcon> = {
   home: Home,
@@ -32,9 +32,9 @@ export function BottomNav({ route }: { route: { path: string } }) {
           const Icon = TAB_ICONS[tab.icon] || LayoutGrid
           const active = tab.path === '/more' ? isMoreActive : isActive(tab.path)
           return (
-            <button
+            <Link
+              href={tab.path}
               key={tab.path}
-              onClick={() => navigate(tab.path)}
               className={`relative flex flex-col items-center justify-center gap-1 min-h-[44px] transition-colors ${
                 active ? 'text-primary' : 'text-muted-foreground'
               }`}
@@ -50,7 +50,7 @@ export function BottomNav({ route }: { route: { path: string } }) {
               )}
               <Icon className="size-[21px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden />
               <span className={`text-[10px] font-medium ${active ? 'font-semibold' : ''}`}>{tab.label}</span>
-            </button>
+            </Link>
           )
         })}
       </div>
