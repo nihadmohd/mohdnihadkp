@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/sheet'
 import { useSession, isAdmin } from '@/components/site/site-context'
 import { NAV_LINKS, MORE_LINKS, SITE, CV_URL } from '@/lib/constants'
-import { navigate } from '@/hooks/use-hash-router'
 import { LiveBadge } from '@/components/site/live-badge'
 
 interface NavProps {
@@ -224,9 +223,11 @@ export function SiteNav({ route, announcement, onCommand }: NavProps) {
                   size="sm"
                   variant="outline"
                   className="border-primary/40 text-primary hover:bg-primary/10"
-                  onClick={() => navigate('/admin')}
+                  asChild
                 >
-                  <LayoutDashboard className="size-4" /> Admin
+                  <Link href="/admin">
+                    <LayoutDashboard className="size-4 mr-1.5" /> Admin
+                  </Link>
                 </Button>
               )}
               {user ? (

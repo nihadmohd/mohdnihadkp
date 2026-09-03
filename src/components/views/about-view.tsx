@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { SectionHeading } from '@/components/shared/section-heading'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import {
   ABOUT_LONG, SKILLS, WHAT_I_BRING, VISION_STATEMENTS, CURRENTLY_EXPLORING,
   CV_URL, SCHOLARSHIP_STATUS, SOCIALS, SITE,
@@ -56,7 +56,7 @@ export default function AboutView() {
             <a href={CV_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="outline"><Download className="size-4" /> CV</Button>
             </a>
-            <Button className="glow-sm" onClick={() => navigate('/contact')}>Hire me</Button>
+            <Button className="glow-sm" asChild><Link href="/contact">Hire me</Link></Button>
           </div>
         </div>
       </div>

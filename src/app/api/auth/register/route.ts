@@ -1,7 +1,7 @@
 // POST /api/auth/register — create account (+ email verification token, dev mode returns link)
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
-import { hashPassword, createToken, hashToken, rateLimit } from '@/lib/auth'
+import { hashPassword, createToken, hashToken, rateLimit, signJwt, setSessionCookie } from '@/lib/auth'
 import { ok, handleError, badRequest, validateEmail } from '@/lib/api-helpers'
 
 export async function POST(req: NextRequest) {
@@ -42,6 +42,9 @@ export async function POST(req: NextRequest) {
     await db.activity.create({
       data: { userId: user.id, action: 'registered', entity: 'user', entityId: user.id },
     })
+
+    const jwt = signJwt({ sub: user.id, email: user.email, role: user.role })
+    await setSessionCookie(jwt)
 
     return ok({
       success: true,

@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { useToast } from '@/hooks/use-toast'
 import { InquiryDialog } from '@/components/views/services-view'
@@ -122,7 +122,7 @@ export default function HelpView() {
           <LifeBuoy className="size-5 text-primary mb-3" />
           <p className="font-semibold text-sm">Still stuck?</p>
           <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed mb-4">Open a support ticket — tracked, with a reply from me directly.</p>
-          <Button size="sm" variant="outline" onClick={() => navigate('/support')}>Open a ticket</Button>
+          <Button size="sm" variant="outline" asChild><Link href="/support">Open a ticket</Link></Button>
         </div>
         <div className="rounded-2xl border border-border bg-card p-5">
           <MessageCircle className="size-5 text-primary mb-3" />

@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { api } from '@/lib/api-client'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useSession, type SessionUser } from '@/components/site/site-context'
 import { useSeo } from '@/hooks/use-seo'
 import { SITE } from '@/lib/constants'
@@ -145,6 +146,7 @@ function FormError({ message }: { message: string }) {
 
 // ─── LOGIN ───────────────────────────────────────────────────
 function LoginView() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -163,7 +165,7 @@ function LoginView() {
         body: { email, password },
       })
       setUser(res.user)
-      navigate(res.user.onboarded ? '/' : '/onboarding')
+      router.push(res.user.onboarded ? '/' : '/onboarding')
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -179,13 +181,13 @@ function LoginView() {
       footer={
         <>
           New here?{' '}
-          <button onClick={() => navigate('/register')} className="text-primary font-medium hover:underline">
+          <Link href={'/register'} className="text-primary font-medium hover:underline">
             Create a free account
-          </button>
+          </Link>
           <span className="mx-1.5 text-border" aria-hidden>·</span>
-          <button onClick={() => navigate('/admin-login')} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
+          <Link href={'/admin-login'} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
             Admin entrance
-          </button>
+          </Link>
         </>
       }
     >
@@ -204,7 +206,7 @@ function LoginView() {
             <Label htmlFor="login-password">Password</Label>
             <button
               type="button"
-              onClick={() => navigate('/forgot-password')}
+              onClick={() => router.push('/forgot-password')}
               className="text-xs text-muted-foreground hover:text-primary"
             >
               Forgot?
@@ -223,6 +225,7 @@ function LoginView() {
 
 // ─── ADMIN LOGIN (gold theme) ────────────────────────────────
 function AdminLoginView() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -241,7 +244,7 @@ function AdminLoginView() {
         body: { email, password },
       })
       setUser(res.user)
-      navigate('/admin')
+      router.push('/admin')
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -259,9 +262,9 @@ function AdminLoginView() {
       footer={
         <>
           Not an admin?{' '}
-          <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">
+          <Link href={'/login'} className="text-primary font-medium hover:underline">
             Use the user sign-in
-          </button>
+          </Link>
         </>
       }
     >
@@ -293,6 +296,7 @@ function AdminLoginView() {
 
 // ─── REGISTER ────────────────────────────────────────────────
 function RegisterView() {
+  const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -321,7 +325,7 @@ function RegisterView() {
       const msg = (err as Error).message
       setError(msg)
       if (msg.toLowerCase().includes('already exists')) {
-        setTimeout(() => navigate('/login'), 2000)
+        setTimeout(() => router.push('/login'), 2000)
       }
     } finally {
       setLoading(false)
@@ -335,18 +339,18 @@ function RegisterView() {
         title="Check your inbox"
         subtitle={`A verification link has been generated for ${email}. In this demo environment email delivery is disabled, so use the button below.`}
         footer={
-          <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">
-            Skip for now — sign in
-          </button>
+          <Link href={'/'} className="text-primary font-medium hover:underline block text-center mt-2">
+            Skip for now — go to home →
+          </Link>
         }
       >
         <div className="space-y-4">
           <Button
             className="w-full h-11 glow-sm"
-            onClick={() => navigate(`/verify-email?token=${created.verifyToken}`)}
-          >
+            asChild
+          ><Link href={`/verify-email?token=${created.verifyToken}`}>
             <ShieldCheck className="size-4" /> Open verification link
-          </Button>
+          </Link></Button>
           <p className="text-xs text-muted-foreground text-center leading-relaxed">
             Production note: wire Supabase SMTP or Resend to send this link by email automatically.
           </p>
@@ -363,9 +367,9 @@ function RegisterView() {
       footer={
         <>
           Already have an account?{' '}
-          <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">
+          <Link href={'/login'} className="text-primary font-medium hover:underline">
             Sign in
-          </button>
+          </Link>
         </>
       }
     >
@@ -393,9 +397,9 @@ function RegisterView() {
         </Button>
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
           By creating an account you agree to the{' '}
-          <button type="button" onClick={() => navigate('/legal/terms-of-service')} className="text-primary hover:underline">Terms</button>
+          <Link href={'/legal/terms-of-service'} className="text-primary hover:underline">Terms</Link>
           {' '}and{' '}
-          <button type="button" onClick={() => navigate('/legal/privacy-policy')} className="text-primary hover:underline">Privacy Policy</button>.
+          <Link href={'/legal/privacy-policy'} className="text-primary hover:underline">Privacy Policy</Link>.
         </p>
       </form>
     </AuthShell>
@@ -404,6 +408,7 @@ function RegisterView() {
 
 // ─── VERIFY EMAIL ────────────────────────────────────────────
 function VerifyEmailView({ token }: { token: string }) {
+  const router = useRouter()
   const [state, setState] = useState<'idle' | 'verifying' | 'done' | 'error' | 'need-token'>(
     token ? 'verifying' : 'need-token'
   )
@@ -439,9 +444,9 @@ function VerifyEmailView({ token }: { token: string }) {
         'Checking your verification token…'
       }
       footer={
-        <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">
-          Continue to sign in →
-        </button>
+        <Link href={'/'} className="text-primary font-medium hover:underline">
+          Continue to home →
+        </Link>
       }
     >
       <div className="space-y-4 text-center">
@@ -451,9 +456,9 @@ function VerifyEmailView({ token }: { token: string }) {
             <span className="mx-auto grid place-items-center size-14 rounded-2xl bg-primary/15 text-primary">
               <Check className="size-7" />
             </span>
-            <Button className="w-full h-11" onClick={() => navigate('/login')}>
-              <LogIn className="size-4" /> Go to sign in
-            </Button>
+            <Button className="w-full h-11 glow-sm" asChild><Link href={'/'}>
+              Continue to home
+            </Link></Button>
           </>
         )}
         {state === 'need-token' && (
@@ -463,9 +468,9 @@ function VerifyEmailView({ token }: { token: string }) {
           </p>
         )}
         {state === 'error' && (
-          <Button variant="outline" className="w-full h-11" onClick={() => navigate('/login')}>
+          <Button variant="outline" className="w-full h-11" asChild><Link href={'/login'}>
             <ArrowLeft className="size-4" /> Back to sign in
-          </Button>
+          </Link></Button>
         )}
       </div>
     </AuthShell>
@@ -474,6 +479,7 @@ function VerifyEmailView({ token }: { token: string }) {
 
 // ─── FORGOT PASSWORD ─────────────────────────────────────────
 function ForgotPasswordView() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -508,17 +514,17 @@ function ForgotPasswordView() {
           : 'Enter your account email and I\u2019ll generate a secure reset link.'
       }
       footer={
-        <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">
+        <Link href={'/login'} className="text-primary font-medium hover:underline">
           <span className="inline-flex items-center gap-1"><ArrowLeft className="size-3.5" /> Back to sign in</span>
-        </button>
+        </Link>
       }
     >
       {sent ? (
         <div className="space-y-4">
           {sent.resetToken ? (
-            <Button className="w-full h-11 glow-sm" onClick={() => navigate(`/reset-password?token=${sent.resetToken}`)}>
+            <Button className="w-full h-11 glow-sm" asChild><Link href={`/reset-password?token=${sent.resetToken}`}>
               <KeyRound className="size-4" /> Continue to reset
-            </Button>
+            </Link></Button>
           ) : (
             <p className="text-sm text-muted-foreground text-center leading-relaxed">
               If that email has an account, the link has been sent for real in production. Try again if needed.
@@ -544,6 +550,7 @@ function ForgotPasswordView() {
 
 // ─── RESET PASSWORD ──────────────────────────────────────────
 function ResetPasswordView({ token }: { token: string }) {
+  const router = useRouter()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
@@ -578,11 +585,11 @@ function ResetPasswordView({ token }: { token: string }) {
         icon={<KeyRound className="size-6" />}
         title="Reset link required"
         subtitle="Open the reset link from the email (or generate one from the Forgot Password page)."
-        footer={<button onClick={() => navigate('/forgot-password')} className="text-primary font-medium hover:underline">Go to forgot password →</button>}
+        footer={<Link href={'/forgot-password'} className="text-primary font-medium hover:underline">Go to forgot password →</Link>}
       >
-        <Button variant="outline" className="w-full h-11" onClick={() => navigate('/forgot-password')}>
+        <Button variant="outline" className="w-full h-11" asChild><Link href={'/forgot-password'}>
           <ArrowLeft className="size-4" /> Forgot password
-        </Button>
+        </Link></Button>
       </AuthShell>
     )
   }
@@ -595,9 +602,9 @@ function ResetPasswordView({ token }: { token: string }) {
         subtitle="Your new password is active and you are signed in. Head home — everything is unlocked."
         footer={null}
       >
-        <Button className="w-full h-11 glow-sm" onClick={() => navigate('/')}>
+        <Button className="w-full h-11 glow-sm" asChild><Link href={'/'}>
           Continue to home
-        </Button>
+        </Link></Button>
       </AuthShell>
     )
   }

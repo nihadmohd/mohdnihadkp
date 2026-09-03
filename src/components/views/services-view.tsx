@@ -21,7 +21,8 @@ import { SectionHeading } from '@/components/shared/section-heading'
 import { AdSlot } from '@/components/shared/ad-slot'
 import { InlineError } from '@/components/views/states'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { SERVICE_OFFERINGS, BUDGET_OPTIONS, SITE, WHAT_I_BRING } from '@/lib/constants'
 import { SERVICES_FAQ } from '@/lib/seo-metadata'
@@ -195,8 +196,8 @@ export default function ServicesView({
             shoots on location, face-to-face project briefings — and clients across India and abroad over WhatsApp, email and video calls.
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate('/contact')} className="shrink-0">
-          Get in touch
+        <Button variant="outline" className="shrink-0" asChild>
+          <Link href="/contact">Get in touch</Link>
         </Button>
       </section>
 
@@ -227,14 +228,14 @@ export default function ServicesView({
           <ul className="grid sm:grid-cols-3 gap-4 mt-6">
             {posts.map((p) => (
               <li key={p.id}>
-                <button
-                  onClick={() => navigate(`/blog/${p.slug}`)}
-                  className="w-full text-left rounded-2xl border border-border bg-card p-5 h-full flex flex-col hover:border-primary/40 transition-colors"
+                <Link
+                  href={`/blog/${p.slug}`}
+                  className="w-full text-left rounded-2xl border border-border bg-card p-5 h-full flex flex-col hover:border-primary/40 transition-colors block"
                 >
                   <p className="font-semibold text-sm leading-snug line-clamp-2">{p.title}</p>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-2 flex-1">{p.excerpt || ''}</p>
                   <p className="text-[11px] text-primary mt-3 font-medium">{p.readingMinutes} min read →</p>
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -265,6 +266,7 @@ export function InquiryDialog({
   const [sending, setSending] = useState(false)
   const [done, setDone] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -302,7 +304,7 @@ export function InquiryDialog({
             </p>
             <div className="flex justify-center gap-3 pt-2">
               <Button onClick={onClose}>Done</Button>
-              <Button variant="outline" onClick={() => { onClose(); navigate('/blog') }}>
+              <Button variant="outline" onClick={() => { onClose(); router.push('/blog') }}>
                 Read the blog
               </Button>
             </div>

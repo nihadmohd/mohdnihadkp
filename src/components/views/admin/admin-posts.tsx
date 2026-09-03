@@ -18,8 +18,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Markdown } from '@/components/markdown'
+import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api-client'
-import { navigate } from '@/hooks/use-hash-router'
 import { useToast } from '@/hooks/use-toast'
 import { EmptyView } from '@/components/views/states'
 import type { MediaRow } from '@/components/views/admin/admin-media'
@@ -49,6 +49,7 @@ export default function AdminPosts({ editId }: { editId?: string }) {
   const [editing, setEditing] = useState<PostRow | null>(null)
   const [creating, setCreating] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -132,7 +133,7 @@ export default function AdminPosts({ editId }: { editId?: string }) {
         onClose={() => {
           setEditing(null)
           setCreating(false)
-          navigate('/admin/posts')
+          router.push('/admin/posts')
           load()
         }}
       />
@@ -151,7 +152,7 @@ export default function AdminPosts({ editId }: { editId?: string }) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" aria-hidden />
             <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search…" className="pl-9 h-9 w-44" aria-label="Search posts" />
           </div>
-          <Button size="sm" className="glow-sm" onClick={() => navigate('/admin/posts/new')}>
+          <Button size="sm" className="glow-sm" onClick={() => router.push('/admin/posts/new')}>
             <Plus className="size-4" /> New post
           </Button>
         </div>
@@ -164,7 +165,7 @@ export default function AdminPosts({ editId }: { editId?: string }) {
           title={query ? 'No posts match' : 'No posts yet'}
           message={query ? 'Try a different search.' : 'Publish your first article — it goes live instantly with full SEO.'}
           icon={<FileText className="size-7 text-muted-foreground" />}
-          action={<Button size="sm" onClick={() => navigate('/admin/posts/new')}><Plus className="size-4" /> Write first post</Button>}
+          action={<Button size="sm" onClick={() => router.push('/admin/posts/new')}><Plus className="size-4" /> Write first post</Button>}
         />
       ) : (
         <ul className="space-y-2.5">
@@ -197,7 +198,7 @@ export default function AdminPosts({ editId }: { editId?: string }) {
                   <Star className={`size-4 ${post.featured ? 'text-amber-500 fill-current' : ''}`} />
                 </Button>
                 {post.published && (
-                  <Button size="icon" variant="ghost" className="size-8" aria-label="View live" onClick={() => navigate(`/blog/${post.slug}`)}>
+                  <Button size="icon" variant="ghost" className="size-8" aria-label="View live" onClick={() => router.push(`/blog/${post.slug}`)}>
                     <ExternalLink className="size-4" />
                   </Button>
                 )}

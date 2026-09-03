@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useSession } from '@/components/site/site-context'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { useToast } from '@/hooks/use-toast'
 
@@ -74,7 +74,7 @@ export default function BillingView() {
       <div className="flex-1 grid place-items-center px-4 py-24 text-center">
         <div>
           <p className="text-muted-foreground">Sign in to manage your subscription.</p>
-          <Button className="mt-4" onClick={() => navigate('/login')}>Sign in</Button>
+          <Button className="mt-4" asChild><Link href="/login">Sign in</Link></Button>
         </div>
       </div>
     )

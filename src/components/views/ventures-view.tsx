@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SectionHeading } from '@/components/shared/section-heading'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { VENTURES } from '@/lib/constants'
 
@@ -76,10 +76,10 @@ export default function VenturesView({ initial }: { initial?: Array<Record<strin
             Malayalam note: <span className="not-italic">ithinte under ellaatharam business um undaavum —</span> this is the base; every kind of business will live under it.
           </p>
           <div className="mt-6 flex gap-3">
-            <Button className="glow-sm" onClick={() => navigate('/contact')}>
+            <Button className="glow-sm" asChild><Link href="/contact">
               Partner with the foundation
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/services')}>See services</Button>
+            </Link></Button>
+            <Button variant="outline" asChild><Link href="/services">See services</Link></Button>
           </div>
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function VenturesView({ initial }: { initial?: Array<Record<strin
         <p className="text-muted-foreground text-sm mt-2 max-w-md mx-auto leading-relaxed">
           I build platforms like these in weeks, not months. Let&apos;s talk about yours.
         </p>
-        <Button className="mt-5 glow-sm" onClick={() => navigate('/contact')}>Start the conversation</Button>
+        <Button className="mt-5 glow-sm" asChild><Link href="/contact">Start the conversation</Link></Button>
       </div>
     </div>
   )

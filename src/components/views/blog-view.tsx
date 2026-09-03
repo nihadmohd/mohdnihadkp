@@ -13,7 +13,7 @@ import { PostCard } from '@/components/views/home-view'
 import { AdSlot } from '@/components/shared/ad-slot'
 import { MarqueeStrip } from '@/components/shared/marquee-strip'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { SITE } from '@/lib/constants'
 
@@ -138,7 +138,7 @@ export default function BlogView({ initial }: { initial?: PostsResponse | null }
             title="First articles are on the way"
             message="The blog is warming up — new pieces on AI-powered building are being drafted right now."
             icon={<Newspaper className="size-7 text-muted-foreground" />}
-            action={<Button variant="outline" onClick={() => navigate('/')}>Back home</Button>}
+            action={<Button variant="outline" asChild><Link href="/">Back home</Link></Button>}
           />
         )
       ) : (

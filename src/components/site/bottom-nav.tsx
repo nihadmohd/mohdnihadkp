@@ -1,7 +1,7 @@
 'use client'
 
 // Mobile bottom tab bar — app-like navigation (5 tabs + safe area support)
-import { motion } from 'framer-motion'
+// Mobile bottom tab bar — app-like navigation (5 tabs + safe area support)
 import { Home, Newspaper, ShoppingBag, Briefcase, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { MOBILE_TABS } from '@/lib/constants'
 import Link from 'next/link'
@@ -42,10 +42,8 @@ export function BottomNav({ route }: { route: { path: string } }) {
               aria-label={tab.label}
             >
               {active && (
-                <motion.span
-                  layoutId="tab-pill"
+                <span
                   className="absolute top-0 w-9 h-1 rounded-b-full bg-primary"
-                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
                 />
               )}
               <Icon className="size-[21px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden />

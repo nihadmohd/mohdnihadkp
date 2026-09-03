@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { api } from '@/lib/api-client'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { SOCIALS, VENTURES, CV_URL } from '@/lib/constants'
 import { LEGAL_DOCS } from '@/lib/legal-content'
 import { LiveBadge } from '@/components/site/live-badge'
@@ -34,7 +34,7 @@ export function invalidateFooterCache() {
 function FooterNavLink({ link }: { link: FooterLinkRow }) {
   const cls = 'text-muted-foreground hover:text-primary transition-colors text-left'
   if (!link.url) {
-    return <button onClick={() => navigate('/')} className={cls}>{link.label}</button>
+    return <Link href="/" className={cls}>{link.label}</Link>
   }
   if (/^https?:\/\//i.test(link.url)) {
     return (
@@ -49,7 +49,7 @@ function FooterNavLink({ link }: { link: FooterLinkRow }) {
     )
   }
   const path = link.url.startsWith('/') ? link.url : `/${link.url}`
-  return <button onClick={() => navigate(path)} className={cls}>{link.label}</button>
+  return <Link href={path} className={cls}>{link.label}</Link>
 }
 
 export function SiteFooter() {
@@ -125,8 +125,8 @@ export function SiteFooter() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Button size="lg" className="glow-sm" onClick={() => navigate('/contact')}>
-                <Radio className="size-4" /> Start a Project
+              <Button size="lg" className="glow-sm" asChild>
+                <Link href="/contact"><Radio className="size-4 mr-2" /> Start a Project</Link>
               </Button>
               <a
                 href={CV_URL}
@@ -220,16 +220,16 @@ export function SiteFooter() {
               : [['Sign In', '/login']]
             ).map(([label, path]) => (
               <li key={path}>
-                <button onClick={() => navigate(path)} className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href={path} className="text-muted-foreground hover:text-primary transition-colors">
                   {label}
-                </button>
+                </Link>
               </li>
             ))}
             {isAdmin(user) && (
               <li>
-                <button onClick={() => navigate('/admin')} className="text-primary hover:text-primary/80 transition-colors font-medium">
+                <Link href="/admin" className="text-primary hover:text-primary/80 transition-colors font-medium">
                   Admin &amp; Developer
-                </button>
+                </Link>
               </li>
             )}
           </ul>

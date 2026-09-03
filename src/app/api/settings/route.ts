@@ -20,6 +20,7 @@ const DEFAULTS: Record<string, string> = {
   seoDescription:
     'Portfolio, blog, store and services of Mohammed Nihad KP — freelancer, businessman and AI-driven developer from Calicut, Kerala.',
   footerNote: 'Built with AI, from Calicut to the world.',
+  defaultTheme: 'dark',
 }
 
 export async function GET() {
@@ -44,6 +45,7 @@ export async function GET() {
           contactEmail: settings.contactEmail,
           whatsappNumber: settings.whatsappNumber,
           footerNote: settings.footerNote,
+          defaultTheme: settings.defaultTheme,
         },
       })
     }

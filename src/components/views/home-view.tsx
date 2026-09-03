@@ -16,7 +16,7 @@ import { SectionHeading, CardSkeleton } from '@/components/shared/section-headin
 import { AdSlot } from '@/components/shared/ad-slot'
 import { MarqueeStrip } from '@/components/shared/marquee-strip'
 import { LiveBadge } from '@/components/site/live-badge'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import {
   SITE, WHAT_I_BRING, VISION_STATEMENTS, SKILLS, VENTURES, SERVICE_OFFERINGS,
 } from '@/lib/constants'
@@ -121,14 +121,14 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                 transition={{ duration: 0.55, delay: 0.24 }}
                 className="mt-7 flex flex-wrap gap-3"
               >
-                <Button size="lg" className="glow-md h-12 px-6 text-[15px]" onClick={() => navigate('/contact')}>
-                  <Radio className="size-4.5" /> Hire Me
+                <Button size="lg" className="glow-md h-12 px-6 text-[15px]" asChild>
+                  <Link href="/contact"><Radio className="size-4.5" /> Hire Me</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="h-12 px-6 text-[15px]" onClick={() => navigate('/services')}>
-                  Explore Services <ArrowRight className="size-4" />
+                <Button size="lg" variant="outline" className="h-12 px-6 text-[15px]" asChild>
+                  <Link href="/services">Explore Services <ArrowRight className="size-4" /></Link>
                 </Button>
-                <Button size="lg" variant="ghost" className="h-12 px-5 text-[15px]" onClick={() => navigate('/blog')}>
-                  Read the Blog
+                <Button size="lg" variant="ghost" className="h-12 px-5 text-[15px]" asChild>
+                  <Link href="/blog">Read the Blog</Link>
                 </Button>
               </motion.div>
 
@@ -208,8 +208,8 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                         </div>
                       ))}
                     </div>
-                    <Button className="w-full" onClick={() => navigate('/about')}>
-                      The full story <ChevronRight className="size-4" />
+                    <Button className="w-full" asChild>
+                      <Link href="/about">The full story <ChevronRight className="size-4" /></Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -268,20 +268,23 @@ export default function HomeView({ initial }: { initial: InitialData }) {
             title="How I can help you"
             description="Every service is executed end-to-end — strategy, creation and delivery by one accountable person."
             action={
-              <Button variant="outline" onClick={() => navigate('/services')}>
-                All services <ArrowRight className="size-4" />
+              <Button variant="outline" asChild>
+                <Link href="/services">All services <ArrowRight className="size-4" /></Link>
               </Button>
             }
           />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {services.slice(0, 6).map((svc, i) => (
-              <motion.button
+              <motion.div
                 key={String(svc.id)}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-                onClick={() => navigate('/services')}
-                className="text-left group rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all"
+                className="group"
               >
+                <Link
+                  href="/services"
+                  className="text-left block h-full rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all"
+                >
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="font-display font-bold text-lg leading-snug">{String(svc.title)}</h3>
                   {svc.priceFrom ? (
@@ -296,7 +299,8 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                 <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
                   Inquire <ArrowRight className="size-3.5 group-hover:translate-x-1 transition-transform" />
                 </span>
-              </motion.button>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -309,8 +313,8 @@ export default function HomeView({ initial }: { initial: InitialData }) {
           title="Fresh from the workbench"
           description="Notes on building with AI, running a one-person business, and the tools that make it possible."
           action={
-            <Button variant="outline" onClick={() => navigate('/blog')}>
-              All articles <ArrowRight className="size-4" />
+            <Button variant="outline" asChild>
+              <Link href="/blog">All articles <ArrowRight className="size-4" /></Link>
             </Button>
           }
         />
@@ -336,20 +340,24 @@ export default function HomeView({ initial }: { initial: InitialData }) {
             title="One foundation, many ventures"
             description="An ecosystem of platforms built from Calicut — commerce, community service, premium goods and education."
             action={
-              <Button variant="outline" onClick={() => navigate('/ventures')}>
-                Explore all <ArrowRight className="size-4" />
+              <Button variant="outline" asChild>
+                <Link href="/ventures">Explore all <ArrowRight className="size-4" /></Link>
               </Button>
             }
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {VENTURES.map((v, i) => (
-              <motion.button
+              <motion.div
                 key={v.name}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-                onClick={() => (v.href ? window.open(v.href, '_blank') : navigate('/ventures'))}
-                className="group text-left rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-all flex items-center gap-4"
               >
+                <Link
+                  href={v.href || '/ventures'}
+                  target={v.href ? '_blank' : undefined}
+                  rel={v.href ? 'noopener noreferrer' : undefined}
+                  className="group block h-full text-left rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-all flex items-center gap-4"
+                >
                 <span className="grid place-items-center size-11 rounded-xl bg-primary/10 text-primary shrink-0 font-display font-bold">
                   {v.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
                 </span>
@@ -361,7 +369,8 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                   <span className="block text-xs text-muted-foreground mt-0.5 truncate">{v.tagline}</span>
                 </span>
                 <Badge variant="secondary" className="shrink-0 text-[10px]">{v.badge}</Badge>
-              </motion.button>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -375,20 +384,23 @@ export default function HomeView({ initial }: { initial: InitialData }) {
             title="Tools I actually use"
             description="Affiliate picks — hosting, AI subscriptions, gear and apps that power my workflow. Curated, not catalogued."
             action={
-              <Button variant="outline" onClick={() => navigate('/store')}>
-                Visit store <ArrowRight className="size-4" />
+              <Button variant="outline" asChild>
+                <Link href="/store">Visit store <ArrowRight className="size-4" /></Link>
               </Button>
             }
           />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {products.slice(0, 4).map((p, i) => (
-              <motion.button
+              <motion.div
                 key={String(p.id)}
                 {...fadeUp}
                 transition={{ ...fadeUp.transition, delay: i * 0.06 }}
-                onClick={() => navigate(`/store/item/${String(p.slug)}`)}
-                className="text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 group"
+                className="group"
               >
+                <Link
+                  href={`/store/item/${String(p.slug)}`}
+                  className="text-left block h-full rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40"
+                >
                 <div className="aspect-[4/3] bg-gradient-to-br from-primary/15 via-muted to-amber-500/10 grid place-items-center overflow-hidden relative">
                   {p.image ? (
                      
@@ -406,7 +418,8 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                     <p className="text-xs mt-2 text-amber-500 font-medium">★ {Number(p.rating).toFixed(1)}</p>
                   )}
                 </div>
-              </motion.button>
+                </Link>
+              </motion.div>
             ))}
           </div>
 
@@ -449,8 +462,8 @@ export default function HomeView({ initial }: { initial: InitialData }) {
                 If you value practical results and out-of-the-box thinking, we&apos;ll get along perfectly.
               </p>
             </div>
-            <Button size="lg" className="glow-md shrink-0" onClick={() => navigate('/contact')}>
-              Let&apos;s connect <ArrowRight className="size-4" />
+            <Button size="lg" className="glow-md shrink-0" asChild>
+              <Link href="/contact">Let&apos;s connect <ArrowRight className="size-4" /></Link>
             </Button>
           </motion.div>
         </div>
@@ -463,12 +476,15 @@ export function PostCard({ post, delay = 0 }: { post: Record<string, unknown>; d
   const tags = String(post.tags || '').split(',').filter(Boolean).slice(0, 2)
   const date = post.publishedAt ? new Date(String(post.publishedAt)) : null
   return (
-    <motion.button
+    <motion.div
       {...fadeUp}
       transition={{ ...fadeUp.transition, delay }}
-      onClick={() => navigate(`/blog/${post.slug}`)}
-      className="text-left group rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col"
+      className="group flex flex-col h-full"
     >
+      <Link
+        href={`/blog/${post.slug}`}
+        className="text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col flex-1"
+      >
       <div className="aspect-[16/9] relative overflow-hidden bg-gradient-to-br from-primary/20 via-muted to-amber-500/10">
         {post.coverImage ? (
            
@@ -508,6 +524,7 @@ export function PostCard({ post, delay = 0 }: { post: Record<string, unknown>; d
           </div>
         )}
       </div>
-    </motion.button>
+      </Link>
+    </motion.div>
   )
 }

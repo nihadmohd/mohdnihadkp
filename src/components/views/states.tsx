@@ -10,7 +10,6 @@ import {
   RefreshCw, Home, ArrowLeft, LogIn, FileQuestion, AlertTriangle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { navigate } from '@/hooks/use-hash-router'
 
 function StateShell({
   code, title, message, icon, actions,
@@ -50,14 +49,14 @@ export function NotFoundView() {
       icon={<FileQuestion className="size-9 text-primary" />}
       actions={
         <>
-          <Button onClick={() => navigate('/')}>
-            <Home className="size-4" /> Back home
+          <Button asChild>
+            <Link href="/"><Home className="size-4" /> Back home</Link>
           </Button>
-          <Button variant="outline" onClick={() => navigate('/blog')}>
-            Read the blog
+          <Button variant="outline" asChild>
+            <Link href="/blog">Read the blog</Link>
           </Button>
-          <Button variant="ghost" onClick={() => navigate('/search')}>
-            <SearchX className="size-4" /> Search
+          <Button variant="ghost" asChild>
+            <Link href="/search"><SearchX className="size-4" /> Search</Link>
           </Button>
         </>
       }
@@ -79,15 +78,15 @@ export function ForbiddenView({ code = 403, message = "You don't have permission
       actions={
         <>
           {showLogin && (
-            <Button onClick={() => navigate('/login')}>
-              <LogIn className="size-4" /> Sign in
+            <Button asChild>
+              <Link href="/login"><LogIn className="size-4" /> Sign in</Link>
             </Button>
           )}
-          <Button variant={showLogin ? 'outline' : 'default'} onClick={() => navigate('/')}>
-            <Home className="size-4" /> Home
+          <Button variant={showLogin ? 'outline' : 'default'} asChild>
+            <Link href="/"><Home className="size-4" /> Home</Link>
           </Button>
-          <Button variant="ghost" onClick={() => navigate('/contact')}>
-            Contact support
+          <Button variant="ghost" asChild>
+            <Link href="/contact">Contact support</Link>
           </Button>
         </>
       }
@@ -109,8 +108,8 @@ export function ErrorView({ error, reset }: { error: Error; reset?: () => void }
               <RefreshCw className="size-4" /> Try again
             </Button>
           )}
-          <Button variant="outline" onClick={() => navigate('/')}>
-            <Home className="size-4" /> Home
+          <Button variant="outline" asChild>
+            <Link href="/"><Home className="size-4" /> Home</Link>
           </Button>
           <Button variant="ghost" onClick={() => window.location.reload()}>
             Reload site
@@ -205,8 +204,8 @@ export function NoSearchResultsView({ query }: { query: string }) {
       message="Try different keywords, check the spelling, or explore the sections directly below."
       icon={<SearchX className="size-7 text-muted-foreground" />}
       action={
-        <Button variant="outline" onClick={() => navigate('/blog')}>
-          Browse all posts
+        <Button variant="outline" asChild>
+          <Link href="/blog">Browse all posts</Link>
         </Button>
       }
     />

@@ -7,7 +7,8 @@ import { Check, ArrowRight, Loader2, Sparkles, Newspaper, Briefcase, ShoppingBag
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { useSession } from '@/components/site/site-context'
 import { useToast } from '@/hooks/use-toast'
@@ -22,6 +23,7 @@ const INTERESTS = [
 
 export default function OnboardingView() {
   const { user, setUser } = useSession()
+  const router = useRouter()
   const [step, setStep] = useState(0)
   const [name, setName] = useState(user?.name || '')
   const [interests, setInterests] = useState<string[]>([])
@@ -34,13 +36,13 @@ export default function OnboardingView() {
       <div className="flex-1 grid place-items-center px-4 py-24 text-center">
         <div>
           <p className="text-muted-foreground">You need to be signed in first.</p>
-          <Button className="mt-4" onClick={() => navigate('/login')}>Sign in</Button>
+          <Button className="mt-4" asChild><Link href="/login">Sign in</Link></Button>
         </div>
       </div>
     )
   }
 
-  const finish = async () => {
+  const finish = async (destination?: string) => {
     setSaving(true)
     try {
       await api('/api/account/profile', {
@@ -49,7 +51,7 @@ export default function OnboardingView() {
       })
       setUser({ ...user, name: name || user.name, onboarded: true })
       toast({ title: `Welcome, ${name.split(' ')[0] || 'friend'}!`, description: 'Your account is ready.' })
-      navigate('/')
+      router.push(destination || '/')
     } catch (err) {
       toast({ title: 'Could not save', description: (err as Error).message, variant: 'destructive' })
     } finally {
@@ -128,7 +130,7 @@ export default function OnboardingView() {
               return (
                 <button
                   key={path as string}
-                  onClick={() => { finish(); }}
+                  onClick={() => { finish(path as string); }}
                   className="flex items-center gap-3 rounded-xl border border-border p-3.5 text-left hover:border-primary/40 transition-colors"
                 >
                   <I className="size-4.5 text-primary" />
@@ -138,7 +140,7 @@ export default function OnboardingView() {
               )
             })}
           </div>
-          <Button className="w-full h-11 glow-sm" onClick={finish} disabled={saving}>
+          <Button className="w-full h-11 glow-sm" onClick={() => finish()} disabled={saving}>
             {saving ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
             Complete setup
           </Button>

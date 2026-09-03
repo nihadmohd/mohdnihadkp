@@ -15,7 +15,8 @@ import { PostCard } from '@/components/views/home-view'
 import { AdSlot } from '@/components/shared/ad-slot'
 import { useSeo } from '@/hooks/use-seo'
 import { useSession } from '@/components/site/site-context'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { SITE, SOCIALS } from '@/lib/constants'
 import { useToast } from '@/hooks/use-toast'
@@ -68,6 +69,7 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
   const [sending, setSending] = useState(false)
   const [commentDone, setCommentDone] = useState(false)
   const [copied, setCopied] = useState(false)
+  const router = useRouter()
 
   const load = useCallback(async () => {
     // Server-rendered post already in place — only top up related posts
@@ -163,7 +165,7 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
   const submitComment = async () => {
     if (!user) {
       toast({ title: 'Sign in to comment', description: 'Create a free account to join the conversation.' })
-      navigate('/login')
+      router.push('/login')
       return
     }
     if (comment.trim().length < 2 || sending) return
@@ -204,7 +206,7 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
         message="This post may have been moved, unpublished, or never existed. The blog has plenty more."
         action={
           <>
-            <Button onClick={() => navigate('/blog')}>All articles</Button>
+            <Button asChild><Link href="/blog">All articles</Link></Button>
             <Button variant="outline" onClick={() => load()}>Retry</Button>
           </>
         }
@@ -221,9 +223,9 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
       <article className="min-w-0 max-w-3xl mx-auto lg:mx-0 w-full">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-7" aria-label="Breadcrumb">
-        <button onClick={() => navigate('/')} className="hover:text-primary transition-colors">Home</button>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span aria-hidden>/</span>
-        <button onClick={() => navigate('/blog')} className="hover:text-primary transition-colors">Blog</button>
+        <Link href="/blog" className="hover:text-primary transition-colors">Blog</Link>
         <span aria-hidden>/</span>
         <span className="text-foreground truncate max-w-[40vw]">{post.title}</span>
       </nav>
@@ -259,9 +261,11 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
 
         <div className="mt-5 flex flex-wrap items-center gap-2">
           {tags.map((t) => (
-            <Badge key={t} variant="secondary" className="cursor-pointer" onClick={() => navigate('/blog')}>
-              #{t}
-            </Badge>
+            <Link key={t} href="/blog">
+              <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80">
+                #{t}
+              </Badge>
+            </Link>
           ))}
           <div className="flex-1" />
           <Button variant="outline" size="sm" onClick={share}>
@@ -292,24 +296,24 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
           <p className="text-sm font-medium leading-snug">
             Need a website, app or media built like this? I do it end-to-end from Calicut, Kerala.
           </p>
-          <button
-            onClick={() => navigate('/services')}
-            className="text-sm font-semibold text-primary hover:underline text-left"
+          <Link
+            href="/services"
+            className="text-sm font-semibold text-primary hover:underline text-left block"
           >
             See my freelance services →
-          </button>
+          </Link>
         </div>
         <div className="rounded-2xl border border-border bg-card p-5 flex flex-col gap-2.5">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">My toolkit</p>
           <p className="text-sm font-medium leading-snug">
             The AI tools, software and gear behind these articles — honestly reviewed.
           </p>
-          <button
-            onClick={() => navigate('/store')}
-            className="text-sm font-semibold text-foreground hover:text-primary transition-colors text-left"
+          <Link
+            href="/store"
+            className="text-sm font-semibold text-foreground hover:text-primary transition-colors text-left block"
           >
             Browse the curated store →
-          </button>
+          </Link>
         </div>
       </aside>
 
@@ -362,7 +366,7 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
         ) : !user ? (
           <div className="rounded-2xl border border-dashed border-border p-6 text-center mb-6">
             <p className="text-sm text-muted-foreground">
-              <button onClick={() => navigate('/login')} className="text-primary font-medium hover:underline">Sign in</button>
+              <Link href="/login" className="text-primary font-medium hover:underline">Sign in</Link>
               {' '}to join the discussion — it takes 30 seconds.
             </p>
           </div>
@@ -406,8 +410,8 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
         <section className="mt-14" aria-label="Related articles">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display text-xl font-bold">Keep reading</h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/blog')}>
-              <ArrowLeft className="size-4" /> All articles
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/blog"><ArrowLeft className="size-4" /> All articles</Link>
             </Button>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -429,12 +433,12 @@ export default function BlogPostView({ slug, initial }: { slug: string; initial?
               <ul className="space-y-3">
                 {related.slice(0, 3).map((r) => (
                   <li key={r.id}>
-                    <button
-                      onClick={() => navigate(`/blog/${r.slug}`)}
-                      className="text-left text-sm font-medium leading-snug hover:text-primary transition-colors line-clamp-2"
+                    <Link
+                      href={`/blog/${r.slug}`}
+                      className="text-left block text-sm font-medium leading-snug hover:text-primary transition-colors line-clamp-2"
                     >
                       {r.title}
-                    </button>
+                    </Link>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{r.readingMinutes} min read</p>
                   </li>
                 ))}

@@ -6,12 +6,12 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip,
   BarChart, Bar, PieChart, Pie, Cell, Legend,
 } from 'recharts'
-import { ChartLine, Eye, Users2, RefreshCw, MousePointerClick, Newspaper, Loader2 } from 'lucide-react'
+import { ChartLine, Eye, Users2, RefreshCw, MousePointerClick, Newspaper, Loader2, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { api } from '@/lib/api-client'
 import { useToast } from '@/hooks/use-toast'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
 
 interface Summary {
   stats: Record<string, number>
@@ -29,6 +29,7 @@ export default function AdminAnalytics() {
   const [data, setData] = useState<Summary | null>(null)
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+  const router = useRouter()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -239,12 +240,13 @@ export default function AdminAnalytics() {
               popularPosts.map((p, i) => (
                 <button
                   key={p.slug}
-                  onClick={() => navigate(`/blog/${p.slug}`)}
-                  className="w-full flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-muted/60 text-left"
+                  onClick={() => router.push(`/blog/${p.slug}`)}
+                  className="w-full group flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-muted/60 text-left"
                 >
                   <span className="font-display font-bold text-sm text-primary/50 w-5 shrink-0">{i + 1}</span>
                   <span className="text-sm truncate flex-1">{p.title}</span>
                   <span className="text-xs text-muted-foreground tabular-nums shrink-0">{p.views} views</span>
+                  <ArrowRight className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               ))
             )}

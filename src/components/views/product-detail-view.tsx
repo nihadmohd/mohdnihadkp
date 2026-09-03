@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { CardSkeleton, SectionHeading } from '@/components/shared/section-heading'
 import { EmptyView, InlineError } from '@/components/views/states'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { useToast } from '@/hooks/use-toast'
 import { AdSlot } from '@/components/shared/ad-slot'
@@ -195,7 +195,7 @@ export default function ProductDetailView({ slug, initial }: { slug: string; ini
             title="Product not found"
             message="This pick may have been removed or the link is incorrect."
             icon={<ShoppingBag className="size-7 text-muted-foreground" />}
-            action={<Button variant="outline" onClick={() => navigate('/store')}>Back to store</Button>}
+            action={<Button variant="outline" asChild><Link href="/store">Back to store</Link></Button>}
           />
         )}
       </div>
@@ -220,9 +220,9 @@ export default function ProductDetailView({ slug, initial }: { slug: string; ini
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="mb-6">
         <ol className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <li><button onClick={() => navigate('/')} className="hover:text-primary transition-colors">Home</button></li>
+          <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
           <li aria-hidden>/</li>
-          <li><button onClick={() => navigate('/store')} className="hover:text-primary transition-colors">Store</button></li>
+          <li><Link href="/store" className="hover:text-primary transition-colors">Store</Link></li>
           <li aria-hidden>/</li>
           <li className="text-foreground truncate max-w-[50vw]">{product.name}</li>
         </ol>
@@ -436,10 +436,10 @@ export default function ProductDetailView({ slug, initial }: { slug: string; ini
           />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mt-6">
             {related.map((p) => (
-              <button
+              <Link
                 key={p.id}
-                onClick={() => navigate(`/store/${p.slug}`)}
-                className="group text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all"
+                href={`/store/${p.slug}`}
+                className="group block text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all"
                 aria-label={`View ${p.name}`}
               >
                 <div className="aspect-square relative bg-gradient-to-br from-primary/15 via-muted to-amber-500/10 grid place-items-center overflow-hidden">
@@ -468,7 +468,7 @@ export default function ProductDetailView({ slug, initial }: { slug: string; ini
                     )}
                   </div>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </section>
@@ -485,14 +485,14 @@ export default function ProductDetailView({ slug, initial }: { slug: string; ini
           <ul className="grid sm:grid-cols-3 gap-4 mt-6">
             {posts.map((p) => (
               <li key={p.id}>
-                <button
-                  onClick={() => navigate(`/blog/${p.slug}`)}
-                  className="w-full text-left rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors"
+                <Link
+                  href={`/blog/${p.slug}`}
+                  className="block w-full text-left rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors"
                 >
                   <p className="font-semibold text-sm leading-snug line-clamp-2">{p.title}</p>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{p.excerpt || ''}</p>
                   <p className="text-[11px] text-primary mt-3 font-medium">{p.readingMinutes} min read →</p>
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
@@ -506,8 +506,8 @@ export default function ProductDetailView({ slug, initial }: { slug: string; ini
             I build AI-powered websites, apps and media from Calicut, Kerala — end to end.
           </p>
         </div>
-        <Button onClick={() => navigate('/services')} className="shrink-0">
-          See my services
+        <Button asChild className="shrink-0">
+          <Link href="/services">See my services</Link>
         </Button>
       </div>
 

@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api-client'
 import { useSession } from '@/components/site/site-context'
 import { useRealtimeFeed } from '@/components/site/live-badge'
@@ -52,6 +52,7 @@ export default function AdminView({
 }) {
   const { user, setUser } = useSession()
   const { toast } = useToast()
+  const router = useRouter()
   const { feed, alerts: onAlerts } = useRealtimeFeed()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
@@ -72,11 +73,11 @@ export default function AdminView({
   const logout = async () => {
     await api('/api/auth/logout', { method: 'POST' }).catch(() => {})
     setUser(null)
-    navigate('/')
+    router.push('/')
   }
 
   const go = (path: string) => {
-    navigate(path)
+    router.push(path)
     setSidebarOpen(false)
   }
 

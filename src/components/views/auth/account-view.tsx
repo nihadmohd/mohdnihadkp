@@ -18,12 +18,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSession } from '@/components/site/site-context'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { useToast } from '@/hooks/use-toast'
 
 export default function AccountView() {
   const { user, setUser, refresh } = useSession()
+  const router = useRouter()
   const { toast } = useToast()
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
@@ -54,7 +56,7 @@ export default function AccountView() {
       <div className="flex-1 grid place-items-center px-4 py-24 text-center">
         <div>
           <p className="text-muted-foreground">Please sign in to manage your account.</p>
-          <Button className="mt-4" onClick={() => navigate('/login')}>Sign in</Button>
+          <Button className="mt-4" asChild><Link href="/login">Sign in</Link></Button>
         </div>
       </div>
     )
@@ -97,7 +99,7 @@ export default function AccountView() {
   const logout = async () => {
     await api('/api/auth/logout', { method: 'POST' }).catch(() => {})
     setUser(null)
-    navigate('/')
+    router.push('/')
   }
 
   const deleteAccount = async () => {
@@ -105,7 +107,7 @@ export default function AccountView() {
       await api('/api/account/profile', { method: 'DELETE' })
       setUser(null)
       toast({ title: 'Account deleted', description: 'Your data has been removed. Sorry to see you go.' })
-      navigate('/')
+      router.push('/')
     } catch (err) {
       toast({ title: 'Could not delete', description: (err as Error).message, variant: 'destructive' })
     }

@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog'
 import { Search, Loader2, FileText, ShoppingBag, Briefcase, Home, CornerDownLeft } from 'lucide-react'
 import { api } from '@/lib/api-client'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
 import { NAV_LINKS, MORE_LINKS } from '@/lib/constants'
 
 interface SearchResult {
@@ -28,6 +28,7 @@ export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (o: 
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [cursor, setCursor] = useState(0)
+  const router = useRouter()
 
   const reset = () => {
     setQuery('')
@@ -57,7 +58,7 @@ export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (o: 
 
   const go = (path: string) => {
     setOpen(false)
-    navigate(path)
+    router.push(path)
   }
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {

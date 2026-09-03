@@ -5,7 +5,7 @@ import { ArrowLeft, ShieldCheck, CalendarDays } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Markdown } from '@/components/markdown'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { getLegalDoc, LEGAL_DOCS } from '@/lib/legal-content'
 import { CookiePreferencesPanel } from '@/components/site/cookie-consent'
 
@@ -27,9 +27,9 @@ export default function LegalView({ slug }: { slug: string }) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <p className="text-muted-foreground">Document not found.</p>
-        <Button className="mt-4" variant="outline" onClick={() => navigate('/legal/privacy-policy')}>
+        <Button className="mt-4" variant="outline" asChild><Link href="/legal/privacy-policy">
           Browse legal documents
-        </Button>
+        </Link></Button>
       </div>
     )
   }
@@ -38,9 +38,9 @@ export default function LegalView({ slug }: { slug: string }) {
     <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-8 sm:py-12 pb-24 lg:pb-14">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-7" aria-label="Breadcrumb">
-        <button onClick={() => navigate('/')} className="hover:text-primary transition-colors">Home</button>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span aria-hidden>/</span>
-        <button onClick={() => navigate(`/legal/${LEGAL_DOCS[0].slug}`)} className="hover:text-primary transition-colors">Legal</button>
+        <Link href={`/legal/${LEGAL_DOCS[0].slug}`} className="hover:text-primary transition-colors">Legal</Link>
         <span aria-hidden>/</span>
         <span className="text-foreground truncate">{doc.title}</span>
       </nav>
@@ -79,22 +79,22 @@ export default function LegalView({ slug }: { slug: string }) {
       </article>
 
       <footer className="mt-12 pt-8 border-t border-border/60 flex flex-wrap items-center justify-between gap-4">
-        <Button variant="outline" onClick={() => navigate('/')}>
+        <Button variant="outline" asChild><Link href="/">
           <ArrowLeft className="size-4" /> Back home
-        </Button>
+        </Link></Button>
         <nav className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs" aria-label="Other legal documents">
           {LEGAL_DOCS.filter((d) => d.slug !== slug).slice(0, 4).map((d) => (
-            <button
+            <Link
               key={d.slug}
-              onClick={() => navigate(`/legal/${d.slug}`)}
+              href={`/legal/${d.slug}`}
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               {d.title}
-            </button>
+            </Link>
           ))}
-          <button onClick={() => navigate(`/legal/${LEGAL_DOCS[0].slug}`)} className="text-primary font-medium">
+          <Link href={`/legal/${LEGAL_DOCS[0].slug}`} className="text-primary font-medium">
             All {LEGAL_DOCS.length} documents →
-          </button>
+          </Link>
         </nav>
       </footer>
     </div>

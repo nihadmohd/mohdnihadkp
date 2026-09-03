@@ -4,35 +4,37 @@
 import { UserRound, LogOut, LayoutDashboard, LifeBuoy, CircleHelp, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useSession, isAdmin } from '@/components/site/site-context'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { MORE_LINKS } from '@/lib/constants'
 import { useSeo } from '@/hooks/use-seo'
 import { api } from '@/lib/api-client'
 
 export default function MoreView() {
   const { user, setUser } = useSession()
+  const router = useRouter()
   useSeo({ title: 'More', description: 'Account, support, legal and everything else.', path: '/more', noindex: true }, ['more'])
 
   const logout = async () => {
     await api('/api/auth/logout', { method: 'POST' }).catch(() => {})
     setUser(null)
-    navigate('/')
+    router.push('/')
   }
 
-  const groups: Array<{ title: string; items: Array<{ label: string; desc: string; icon: string; onClick: () => void }> }> = [
+  const groups: Array<{ title: string; items: Array<{ label: string; desc: string; icon: string; onClick?: () => void; href?: string }> }> = [
     {
       title: 'Account',
       items: user
         ? [
-            { label: 'My Account', desc: 'Profile, password & settings', icon: 'user', onClick: () => navigate('/account') },
-            { label: 'Billing & Plans', desc: 'Upgrade, downgrade or cancel', icon: 'card', onClick: () => navigate('/billing') },
-            { label: 'Support Tickets', desc: 'Get help from me directly', icon: 'life', onClick: () => navigate('/support') },
-            ...(isAdmin(user) ? [{ label: 'Admin Dashboard', desc: 'Manage the entire site', icon: 'admin', onClick: () => navigate('/admin') }] : []),
+            { label: 'My Account', desc: 'Profile, password & settings', icon: 'user', href: '/account' },
+            { label: 'Billing & Plans', desc: 'Upgrade, downgrade or cancel', icon: 'card', href: '/billing' },
+            { label: 'Support Tickets', desc: 'Get help from me directly', icon: 'life', href: '/support' },
+            ...(isAdmin(user) ? [{ label: 'Admin Dashboard', desc: 'Manage the entire site', icon: 'admin', href: '/admin' }] : []),
             { label: 'Sign Out', desc: 'See you soon', icon: 'out', onClick: logout },
           ]
         : [
-            { label: 'Sign In', desc: 'Welcome back', icon: 'in', onClick: () => navigate('/login') },
-            { label: 'Create Account', desc: 'Join in 30 seconds', icon: 'user', onClick: () => navigate('/register') },
+            { label: 'Sign In', desc: 'Welcome back', icon: 'in', href: '/login' },
+            { label: 'Create Account', desc: 'Join in 30 seconds', icon: 'user', href: '/register' },
           ],
     },
     {
@@ -41,16 +43,16 @@ export default function MoreView() {
         label: l.label,
         desc: l.label === 'Ventures' ? 'KP Foundation ecosystem' : l.label === 'Contact' ? 'Start a conversation' : l.label === 'Search' ? 'Find anything' : 'My story & vision',
         icon: l.icon,
-        onClick: () => navigate(l.path),
+        href: l.path,
       })),
     },
     {
       title: 'Help & info',
       items: [
-        { label: 'Help Center', desc: 'FAQs and quick guides', icon: 'help', onClick: () => navigate('/help') },
-        { label: 'Privacy Policy', desc: 'Your data, your rights', icon: 'doc', onClick: () => navigate('/legal/privacy-policy') },
-        { label: 'Terms of Service', desc: 'The ground rules', icon: 'doc', onClick: () => navigate('/legal/terms-of-service') },
-        { label: 'All legal documents', desc: '15 policies in plain language', icon: 'doc', onClick: () => navigate('/legal/privacy-policy') },
+        { label: 'Help Center', desc: 'FAQs and quick guides', icon: 'help', href: '/help' },
+        { label: 'Privacy Policy', desc: 'Your data, your rights', icon: 'doc', href: '/legal/privacy-policy' },
+        { label: 'Terms of Service', desc: 'The ground rules', icon: 'doc', href: '/legal/terms-of-service' },
+        { label: 'All legal documents', desc: '15 policies in plain language', icon: 'doc', href: '/legal/privacy-policy' },
       ],
     },
   ]
@@ -69,8 +71,8 @@ export default function MoreView() {
             <p className="font-semibold truncate">{user.name}</p>
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => navigate('/account')}>
-            <UserRound className="size-4" /> Account
+          <Button size="sm" variant="outline" asChild>
+            <Link href="/account"><UserRound className="size-4" /> Account</Link>
           </Button>
         </div>
       )}
@@ -81,8 +83,8 @@ export default function MoreView() {
             <p className="text-xs text-muted-foreground mt-0.5">Sign in to comment, get support and unlock your account.</p>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" onClick={() => navigate('/login')}><LogOut className="size-4 rotate-180" /> Sign in</Button>
-            <Button size="sm" variant="outline" onClick={() => navigate('/register')}>Register</Button>
+            <Button size="sm" asChild><Link href="/login"><LogOut className="size-4 rotate-180" /> Sign in</Link></Button>
+            <Button size="sm" variant="outline" asChild><Link href="/register">Register</Link></Button>
           </div>
         </div>
       )}
@@ -91,31 +93,40 @@ export default function MoreView() {
         <section key={g.title} className="mb-7" aria-label={g.title}>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 px-1">{g.title}</p>
           <div className="rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border/60">
-            {g.items.map((item) => (
-              <button
-                key={item.label}
-                onClick={item.onClick}
-                className="w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
-              >
-                <span className="grid place-items-center size-9 rounded-xl bg-muted text-foreground shrink-0">
-                  {item.icon === 'user' || item.icon === 'user-round' ? <UserRound className="size-4.5" /> :
-                   item.icon === 'card' ? <CreditCard className="size-4.5" /> :
-                   item.icon === 'life' ? <LifeBuoy className="size-4.5" /> :
-                   item.icon === 'admin' ? <LayoutDashboard className="size-4.5" /> :
-                   item.icon === 'out' ? <LogOut className="size-4.5" /> :
-                   item.icon === 'in' ? <LogOut className="size-4.5 rotate-180" /> :
-                   item.icon === 'help' ? <CircleHelp className="size-4.5" /> :
-                   item.icon === 'network' ? <LayoutDashboard className="size-4.5" /> :
-                   item.icon === 'mail' ? <LifeBuoy className="size-4.5" /> :
-                   item.icon === 'search' ? <CircleHelp className="size-4.5" /> :
-                   <CircleHelp className="size-4.5" />}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-medium">{item.label}</span>
-                  <span className="block text-xs text-muted-foreground mt-0.5">{item.desc}</span>
-                </span>
-              </button>
-            ))}
+            {g.items.map((item) => {
+              const content = (
+                <>
+                  <span className="grid place-items-center size-9 rounded-xl bg-muted text-foreground shrink-0">
+                    {item.icon === 'user' || item.icon === 'user-round' ? <UserRound className="size-4.5" /> :
+                     item.icon === 'card' ? <CreditCard className="size-4.5" /> :
+                     item.icon === 'life' ? <LifeBuoy className="size-4.5" /> :
+                     item.icon === 'admin' ? <LayoutDashboard className="size-4.5" /> :
+                     item.icon === 'out' ? <LogOut className="size-4.5" /> :
+                     item.icon === 'in' ? <LogOut className="size-4.5 rotate-180" /> :
+                     item.icon === 'help' ? <CircleHelp className="size-4.5" /> :
+                     item.icon === 'network' ? <LayoutDashboard className="size-4.5" /> :
+                     item.icon === 'mail' ? <LifeBuoy className="size-4.5" /> :
+                     item.icon === 'search' ? <CircleHelp className="size-4.5" /> :
+                     <CircleHelp className="size-4.5" />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium">{item.label}</span>
+                    <span className="block text-xs text-muted-foreground mt-0.5">{item.desc}</span>
+                  </span>
+                </>
+              )
+              const className = "w-full flex items-center gap-4 p-4 text-left hover:bg-muted/50 transition-colors"
+              
+              return item.href ? (
+                <Link key={item.label} href={item.href} className={className}>
+                  {content}
+                </Link>
+              ) : (
+                <button key={item.label} onClick={item.onClick} className={className}>
+                  {content}
+                </button>
+              )
+            })}
           </div>
         </section>
       ))}

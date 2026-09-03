@@ -6,7 +6,7 @@ import { MessageSquare, Check, Trash2, ExternalLink, Loader2, Clock3 } from 'luc
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api-client'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
 import { EmptyView } from '@/components/views/states'
 
@@ -25,6 +25,7 @@ export default function AdminComments() {
   const [filter, setFilter] = useState<'pending' | 'approved' | 'all'>('pending')
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+  const router = useRouter()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -106,7 +107,7 @@ export default function AdminComments() {
                 </span>
                 <span className="text-sm font-semibold">{c.user.name || 'Anonymous'}</span>
                 <button
-                  onClick={() => navigate(`/blog/${c.post.slug}`)}
+                  onClick={() => router.push(`/blog/${c.post.slug}`)}
                   className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 truncate"
                 >
                   on “{c.post.title}” <ExternalLink className="size-3 shrink-0" />

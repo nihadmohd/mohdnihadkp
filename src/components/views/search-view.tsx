@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { SectionHeading } from '@/components/shared/section-heading'
 import { NoSearchResultsView } from '@/components/views/states'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 
 interface SearchResult {
@@ -133,8 +133,8 @@ export default function SearchView({ query: initialQuery }: { query: string }) {
             const meta = TYPE_META[r.type]
             return (
               <li key={`${r.type}-${r.title}-${i}`} style={{ animation: `fadeIn 0.35s ${i * 0.04}s both` }}>
-                <button
-                  onClick={() => navigate(r.path)}
+                <Link
+                  href={r.path}
                   className="w-full text-left rounded-2xl border border-border bg-card p-4 sm:p-5 hover:border-primary/40 transition-colors flex items-center gap-4 group"
                 >
                   <span className="grid place-items-center size-11 rounded-xl bg-muted shrink-0 group-hover:bg-primary/10 transition-colors">
@@ -149,7 +149,7 @@ export default function SearchView({ query: initialQuery }: { query: string }) {
                     </span>
                     <span className="block text-sm text-muted-foreground mt-0.5 line-clamp-1">{r.description}</span>
                   </span>
-                </button>
+                </Link>
               </li>
             )
           })}

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { CardSkeleton, SectionHeading } from '@/components/shared/section-heading'
 import { EmptyView, NoSearchResultsView, InlineError } from '@/components/views/states'
 import { useSeo } from '@/hooks/use-seo'
-import { navigate } from '@/hooks/use-hash-router'
+import Link from 'next/link'
 import { api } from '@/lib/api-client'
 import { AdSlot } from '@/components/shared/ad-slot'
 import { MarqueeStrip } from '@/components/shared/marquee-strip'
@@ -182,10 +182,10 @@ export default function StoreView({ initial }: { initial: Array<Record<string, u
           </p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
             {products.map((p) => (
-              <button
+              <Link
                 key={p.id}
-                onClick={() => navigate(`/store/${p.slug}`)}
-                className="group text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col"
+                href={`/store/${p.slug}`}
+                className="group block text-left rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col"
                 aria-label={`View ${p.name}`}
               >
                 <div className="aspect-square relative bg-gradient-to-br from-primary/15 via-muted to-amber-500/10 grid place-items-center overflow-hidden">
@@ -230,7 +230,7 @@ export default function StoreView({ initial }: { initial: Array<Record<string, u
                     <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-primary transition-colors" aria-hidden />
                   </div>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
 

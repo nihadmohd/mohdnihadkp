@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/api-client'
-import { navigate } from '@/hooks/use-hash-router'
+import { useRouter } from 'next/navigation'
 import type { ActivityEntry, AdminAlert, LiveStats } from '@/hooks/use-realtime'
 import { useLiveStats } from '@/components/site/live-badge'
 import { StatsSkeleton } from '@/components/shared/section-heading'
@@ -31,6 +31,7 @@ export default function AdminDashboard({ feed, alerts }: { feed: ActivityEntry[]
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentActivity, setRecentActivity] = useState<Array<{ id: string; action: string; meta: string | null; createdAt: string; user: { name: string | null; email: string } | null }>>([])
   const live = useLiveStats()
+  const router = useRouter()
 
   const load = useCallback(async () => {
     try {
@@ -79,10 +80,10 @@ export default function AdminDashboard({ feed, alerts }: { feed: ActivityEntry[]
           <p className="text-sm text-muted-foreground mt-1">Everything on the site, live — refreshed the moment it happens.</p>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => navigate('/admin/posts?new=1')}>
+          <Button size="sm" onClick={() => router.push('/admin/posts?new=1')}>
             <Plus className="size-4" /> New post
           </Button>
-          <Button size="sm" variant="outline" onClick={() => navigate('/admin/products')}>
+          <Button size="sm" variant="outline" onClick={() => router.push('/admin/products')}>
             <Plus className="size-4" /> Product
           </Button>
         </div>
@@ -108,7 +109,7 @@ export default function AdminDashboard({ feed, alerts }: { feed: ActivityEntry[]
               </Card>
             )
             return c.link ? (
-              <button key={c.label} onClick={() => navigate(c.link!)} className="text-left" aria-label={c.label}>{Inner}</button>
+              <button key={c.label} onClick={() => router.push(c.link!)} className="text-left" aria-label={c.label}>{Inner}</button>
             ) : (
               <div key={c.label}>{Inner}</div>
             )
@@ -160,7 +161,7 @@ export default function AdminDashboard({ feed, alerts }: { feed: ActivityEntry[]
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <FileEdit className="size-4 text-primary" /> Site log
-              <button onClick={() => navigate('/admin/settings')} className="ml-auto text-xs text-muted-foreground hover:text-primary">
+              <button onClick={() => router.push('/admin/settings')} className="ml-auto text-xs text-muted-foreground hover:text-primary">
                 full log →
               </button>
             </CardTitle>

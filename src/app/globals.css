@@ -139,8 +139,15 @@
 @layer utilities {
   .glass {
     background: color-mix(in oklab, var(--card) 82%, transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transform: translateZ(0);
+  }
+  @media (min-width: 768px) {
+    .glass {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
   }
   .glow-sm {
     box-shadow: 0 0 14px 0 var(--glow);
@@ -197,6 +204,7 @@
 }
 .animate-aurora {
   animation: aurora-drift 18s ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes pulse-dot {
@@ -213,11 +221,13 @@
 }
 .animate-marquee {
   animation: marquee-x 30s linear infinite;
+  will-change: transform;
 }
 
 /* Scrolling image strip (admin-managed marquee items) */
 .animate-marquee-items {
   animation: marquee-x var(--marquee-duration, 26s) linear infinite;
+  will-change: transform;
 }
 
 /* Stickers popping into blog content */

@@ -1,7 +1,7 @@
 // POST /api/auth/verify-email — verify email with token (or resend)
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
-import { hashToken, createToken, getSession, requireUser } from '@/lib/auth'
+import { hashToken, createToken, getSession, requireUser, signJwt, setSessionCookie } from '@/lib/auth'
 import { ok, handleError, badRequest } from '@/lib/api-helpers'
 
 export async function POST(req: NextRequest) {
@@ -29,6 +29,12 @@ export async function POST(req: NextRequest) {
       await db.activity.create({
         data: { userId: record.userId, action: 'verified email', entity: 'user', entityId: record.userId },
       })
+
+      const userToLogin = await db.user.findUnique({ where: { id: record.userId } })
+      if (userToLogin) {
+        const jwt = signJwt({ sub: userToLogin.id, email: userToLogin.email, role: userToLogin.role })
+        await setSessionCookie(jwt)
+      }
 
       return ok({ success: true, message: 'Email verified successfully.' })
     }

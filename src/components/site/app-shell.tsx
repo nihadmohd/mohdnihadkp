@@ -10,7 +10,7 @@
 // from the Next.js App Router tree in src/app/**.
 // ─────────────────────────────────────────────────────────────
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
-import { useHashRouter } from '@/hooks/use-hash-router'
+import { usePathname } from 'next/navigation'
 import { useRealtime } from '@/hooks/use-realtime'
 import { api, SESSION_EXPIRED_EVENT } from '@/lib/api-client'
 import {
@@ -47,7 +47,8 @@ export interface AppShellProps {
 }
 
 export function AppShell({ children, settings: initialSettings, chrome = true }: AppShellProps) {
-  const route = useHashRouter()
+  const pathname = usePathname()
+  const route = { path: pathname || '/', segments: (pathname || '/').split('/').filter(Boolean) }
   const [user, setUser] = useState<SessionUser | null>(null)
   const [sessionLoaded, setSessionLoaded] = useState(false)
   const [settings, setSettings] = useState<SiteSettings>({ ...initialSettings })
